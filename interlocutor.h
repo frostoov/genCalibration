@@ -37,4 +37,5 @@ private:
 	int					_channel;
 };
 
+
 #endif // INTERLOCUTOR_H
