@@ -14,6 +14,7 @@ using namespace std;
 class tekModule : public Subject
 {
 public:
+	tekModule();
 	bool		openSession	();
 	bool		closeSession();
 	bool		setPing				(const int& mSec);
@@ -38,6 +39,7 @@ protected:
 	void pushAction(tekActions action,ViStatus status);
 private:
 
+	bool					active;
 	ViSession				_mainSession;
 	ViSession				_thisSession;
 	ViFindList				_mainFList;

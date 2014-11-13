@@ -7,6 +7,11 @@ void tekModule::setChannel(const int &channel)
 	_channel = channel;
 }
 
+tekModule::tekModule()
+{
+	active =false;
+}
+
 bool tekModule::openSession()
 {
 	ViStatus status;
@@ -25,6 +30,7 @@ bool tekModule::openSession()
 	status = viSetAttribute(_thisSession, VI_ATTR_TMO_VALUE, 1000);
 	if (status < VI_SUCCESS)
 		return false;
+	active = true;
 	return true;
 }
 
@@ -37,6 +43,7 @@ bool tekModule::closeSession()
 	status = viClose(_mainSession);
 	if (status < VI_SUCCESS)
 		return false;
+	active = false;
 	return true;
 }
 
@@ -58,6 +65,7 @@ void tekModule::pushAction(tekActions action, ViStatus status)
 
 bool tekModule::setDefaultSettings(const int& channel)
 {
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	string fatherCompile, compile;
@@ -97,6 +105,7 @@ bool tekModule::setDefaultSettings(const int& channel)
 
 bool tekModule::setPing(const int &mSec)
 {
+	if(!active) return false;
 	ViUInt32 retCount = 0;
 	stringstream data;
 	data << "SOUR" << _channel << ":BURS:TDEL " << mSec << "ms";
@@ -109,6 +118,7 @@ bool tekModule::setPing(const int &mSec)
 
 bool tekModule::setLeftFront(const int &leftFront)
 {
+	if(!active) return false;
 	ViUInt32 retCount = 0;
 	stringstream data;
 	data << "SOUR" << _channel << ":PULS:TRAN:LEAD " << leftFront << "ns";
@@ -121,6 +131,7 @@ bool tekModule::setLeftFront(const int &leftFront)
 
 bool tekModule::setRightFront(const int &rightFront)
 {
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	stringstream data;
@@ -134,6 +145,7 @@ bool tekModule::setRightFront(const int &rightFront)
 
 bool tekModule::setCountSignals(const int &count)
 {
+	if(!active) return false;
 	ViUInt32 retCount = 0;
 	stringstream data;
 	data << "SOUR" << _channel << ":BURS:NCYC " << count;
@@ -146,6 +158,7 @@ bool tekModule::setCountSignals(const int &count)
 
 bool tekModule::setFrequency(const int &freq)
 {
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	stringstream data;
@@ -159,7 +172,7 @@ bool tekModule::setFrequency(const int &freq)
 
 bool tekModule::setAmplitude(const int &amp)
 {
-//SOUR1:PULS:TRAN:LEAD 200ns
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	stringstream data;
@@ -179,6 +192,7 @@ bool tekModule::setAmplitude(const int &amp)
 
 bool tekModule::setInterval(const int &interval)
 {
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	stringstream data;
@@ -192,6 +206,7 @@ bool tekModule::setInterval(const int &interval)
 
 bool tekModule::activateChannel(const bool &statusChannel)
 {
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	stringstream data;
@@ -209,6 +224,7 @@ bool tekModule::activateChannel(const bool &statusChannel)
 
 bool tekModule::setWidth(const int &mSec)
 {
+	if(!active) return false;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	stringstream data;
@@ -222,6 +238,7 @@ bool tekModule::setWidth(const int &mSec)
 
 string tekModule::getWidth() const
 {
+	if(!active) return string();
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	ViChar buffer[256];
@@ -235,6 +252,7 @@ string tekModule::getWidth() const
 
 string tekModule::getAmplitude() const
 {
+	if(!active) return string();
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	ViChar buffer[256];
@@ -248,6 +266,7 @@ string tekModule::getAmplitude() const
 
 string tekModule::getLeftFront() const
 {
+	if(!active) return string();;
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	ViChar buffer[256];
@@ -261,6 +280,7 @@ string tekModule::getLeftFront() const
 
 string tekModule::getRightFront() const
 {
+	if(!active) return string();
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	ViChar buffer[256];
@@ -274,6 +294,7 @@ string tekModule::getRightFront() const
 
 string tekModule::getInterval() const
 {
+	if(!active) return string();
 	ViStatus status;
 	ViUInt32 retCount = 0;
 	ViChar buffer[256];
