@@ -8,19 +8,27 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET		= generatorGUI
+TARGET		= tekControl
 TEMPLATE	= app
+CONFIG		+= c++11
 
 SOURCES += \
 	main.cpp\
 	mainwindow.cpp \
-    interlocutor.cpp
+    observer.cpp \
+    teksettings.cpp \
+    tekmodule.cpp \
+    tekoutput.cpp
 
 HEADERS  += \
 	mainwindow.h \
-    interlocutor.h \
     visa.h \
-    visatype.h
+    visatype.h \
+    observer.h \
+    teksettings.h \
+    tekmodule.h \
+    tektypes.h \
+    tekoutput.h
 
 linux{
 	LIBS        +=	-L$$PWD/lib/ -lvisa
@@ -30,4 +38,9 @@ windows{
 	LIBS += -L$$PWD/dll/Visa32.dll
 	LIBS += -L$$PWD/dll/tkVisa32.dll
 }
-CONFIG		+= c++11
+
+release {
+	QMAKE_CXXFLAGS_RELEASE	-= -O1
+	QMAKE_CXXFLAGS_RELEASE	-= -O2
+	QMAKE_CXXFLAGS_RELEASE	*= -O3
+}

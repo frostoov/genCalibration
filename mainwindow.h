@@ -11,7 +11,7 @@
 #include <QRadioButton>
 #include <QTimer>
 #include <string>
-#include "interlocutor.h"
+#include "tekmodule.h"
 
 using namespace std;
 
@@ -46,7 +46,7 @@ private:
 	void		readFromMemory(const int& numberChannel);
 	void		writeToMemory(const int& numberChannel);
 
-	ViInterlocutor	converVi;
+	tekModule	converVi;
 	memoryGUI_t		oneChannelMemory, twoChannelMemory;
 	double			amp, ampStep, ampEnd;
 private slots:

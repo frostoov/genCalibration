@@ -21,3 +21,6 @@
 *.exe
 *.out
 *.app
+
+#Qt meta
+*.pro.user
