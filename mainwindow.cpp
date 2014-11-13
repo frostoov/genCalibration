@@ -3,30 +3,97 @@
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
+	: QMainWindow(parent)
 {
 	initializeElements();
 	initializeLayouts();
-	this->setLayout(mainHLayout);
+	centralWidget->setLayout(mainHLayout);
 
-	connect(exitButton, SIGNAL(clicked()), this, SLOT(close()));
-	connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClick()));
-	connect(endButton, SIGNAL(clicked()), this, SLOT(endButtonClick()));
-	connect(goButton, SIGNAL(clicked()), this, SLOT(goButtonClick()));
-	connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClick()));
-	connect(channelOneButton, SIGNAL(clicked()), this, SLOT(chooseOneChannel()));
-	connect(channelTwoButton, SIGNAL(clicked()), this, SLOT(chooseTwoChannel()));
-	connect(stopButton, SIGNAL(clicked()), this, SLOT(stopButtonClick()));
-	connect(goTimer, SIGNAL(timeout()), this, SLOT(changeSettings()));
+	connect(exitButton,		&QPushButton::clicked,
+			this,			&MainWindow::close);
+	connect(startButton,	&QPushButton::clicked,
+			this,			&MainWindow::startButtonClick);
+	connect(endButton,		&QPushButton::clicked,
+			this,			&MainWindow::endButtonClick);
+	connect(goButton,		&QPushButton::clicked,
+			this,			&MainWindow::goButtonClick);
+	connect(applyButton,	&QPushButton::clicked,
+			this,			&MainWindow::applyButtonClick);
+	connect(stopButton,		&QPushButton::clicked,
+			this,			&MainWindow::stopButtonClick);
+
+	connect(channelOneButton,	&QRadioButton::clicked,
+			this,				&MainWindow::chooseOneChannel);
+	connect(channelTwoButton,	&QRadioButton::clicked,
+			this,				&MainWindow::chooseTwoChannel);
+	connect(goTimer,			&QTimer::timeout,
+			this,				&MainWindow::changeSettings);
+}
+
+MainWindow::~MainWindow()
+{
+	disconnect(exitButton,		&QPushButton::clicked,
+			this,				&MainWindow::close);
+	disconnect(startButton,		&QPushButton::clicked,
+			this,				&MainWindow::startButtonClick);
+	disconnect(endButton,		&QPushButton::clicked,
+			this,				&MainWindow::endButtonClick);
+	disconnect(goButton,		&QPushButton::clicked,
+			this,				&MainWindow::goButtonClick);
+	disconnect(applyButton,		&QPushButton::clicked,
+			this,				&MainWindow::applyButtonClick);
+	disconnect(stopButton,		&QPushButton::clicked,
+			this,				&MainWindow::stopButtonClick);
+	disconnect(channelOneButton,&QRadioButton::clicked,
+			this,				&MainWindow::chooseOneChannel);
+	disconnect(channelTwoButton,&QRadioButton::clicked,
+			this,				&MainWindow::chooseTwoChannel);
+	disconnect(goTimer,			&QTimer::timeout,
+			this,				&MainWindow::changeSettings);
+	delete startButton;
+	delete stopButton;
+	delete endButton;
+	delete exitButton;
+	delete goButton;
+	delete leftFrontEdit;
+	delete rightFrontEdit;
+	delete intervalEdit;
+	delete widthEdit;
+	delete leftFrontLabel;
+	delete rightFrontLabel;
+	delete intervalLabel;
+	delete widthLabel;
+	delete channelOneButton;
+	delete channelTwoButton;
+	delete ampStepLabel;
+	delete ampStepEdit;
+	delete ampStartLabel;
+	delete ampEndEdit;
+	delete ampEndLabel;
+
+	delete goTimer;
+
+	delete editVLayout;
+	delete settingsHLayout;
+	delete controlHLayout;
+	delete rightVLayout;
+	delete mainHLayout;
+
+	delete centralWidget;
 }
 
 void MainWindow::initializeLayouts()
 {
+	centralWidget = new QWidget(this);
+	setCentralWidget(centralWidget);
 	mainHLayout =		new QHBoxLayout;
 	rightVLayout =		new QVBoxLayout;
 	controlHLayout =	new QHBoxLayout;
 	settingsHLayout =	new QHBoxLayout;
 	editVLayout =		new QVBoxLayout;
 	goApplyVLayout =	new QVBoxLayout;
+	mainHLayout->setAlignment(Qt::AlignTop);
+	editVLayout->setAlignment(Qt::AlignTop);
 	editVLayout->		addWidget(leftFrontLabel);
 	editVLayout->		addWidget(leftFrontEdit);
 	editVLayout->		addWidget(rightFrontLabel);
@@ -59,52 +126,38 @@ void MainWindow::initializeLayouts()
 
 void MainWindow::initializeElements()
 {
-	startButton =		new QPushButton("Start session");
-	endButton =			new QPushButton("End session");
-	exitButton =		new QPushButton("Exit");
-	goButton =			new QPushButton("Go");
-	applyButton =		new QPushButton("Apply");
-	stopButton =		new QPushButton("Stop");
-	leftFrontEdit =		new QLineEdit;
-	rightFrontEdit =	new QLineEdit;
-	intervalEdit =		new QLineEdit;
-	widthEdit =			new QLineEdit;
-	ampStartEdit =		new QLineEdit;
-	ampEndEdit =		new QLineEdit;
-	ampStepEdit =		new QLineEdit;
-	leftFrontLabel =	new QLabel("Left Front, ns");
-	rightFrontLabel =	new QLabel("Right Front, ns");
-	intervalLabel =		new QLabel("Interval, ms");
-	widthLabel =		new QLabel("Width, ns");
-	ampStartLabel =		new QLabel("Amplitude start, mV");
-	ampEndLabel =		new QLabel("Amplitude end, mV");
-	ampStepLabel =		new QLabel("Step amplitude per second");
-	channelOneButton =	new QRadioButton;
-	channelOneButton->setText("Channel One");
+	startButton =		new QPushButton("Start session",this);
+	endButton =			new QPushButton("End session",this);
+	exitButton =		new QPushButton("Exit",this);
+	goButton =			new QPushButton("Go",this);
+	applyButton =		new QPushButton("Apply",this);
+	stopButton =		new QPushButton("Stop",this);
+	leftFrontEdit =		new QLineEdit(this);
+	rightFrontEdit =	new QLineEdit(this);
+	intervalEdit =		new QLineEdit(this);
+	widthEdit =			new QLineEdit(this);
+	ampStartEdit =		new QLineEdit(this);
+	ampEndEdit =		new QLineEdit(this);
+	ampStepEdit =		new QLineEdit(this);
+	leftFrontLabel =	new QLabel("Left Front, ns",this);
+	rightFrontLabel =	new QLabel("Right Front, ns",this);
+	intervalLabel =		new QLabel("Interval, ms",this);
+	widthLabel =		new QLabel("Width, ns",this);
+	ampStartLabel =		new QLabel("Amplitude start, mV",this);
+	ampEndLabel =		new QLabel("Amplitude end, mV",this);
+	ampStepLabel =		new QLabel("Step amplitude per second",this);
+	channelOneButton =	new QRadioButton(tr("Channel One"),this);
+	channelTwoButton =	new QRadioButton(tr("ChannelTwo"),this);
 	channelOneButton->setChecked(true);
-	channelTwoButton =	new QRadioButton;
-	channelTwoButton->setText("ChannelTwo");
-	viewList =			new QListWidget;
-	goTimer =			new QTimer;
-}
-
-MainWindow::~MainWindow()
-{
-	delete startButton;	delete endButton;	delete exitButton;	delete goButton;
-	delete leftFrontEdit;	delete rightFrontEdit;	delete intervalEdit;	delete widthEdit;
-	delete ampStepEdit;		delete leftFrontLabel;	delete rightFrontLabel;	delete intervalLabel;
-	delete widthLabel;	delete ampStartLabel;	delete channelOneButton;
-	delete editVLayout;	delete settingsHLayout;	delete controlHLayout;	delete rightVLayout;
-	delete mainHLayout; delete channelTwoButton;	delete ampStepLabel;	delete ampStepEdit;
-	delete ampStartLabel;	delete ampEndEdit; delete ampEndLabel;	delete stopButton;
-	delete goTimer;
+	goTimer =			new QTimer(this);
+	viewList =			new QPlainTextEdit(this);
+	viewList->setReadOnly(true);
 }
 
 void MainWindow::addToList(const string &addStr)
 {
-	viewList->addItem("##############\n\n");
-	viewList->addItem(QString::fromStdString(addStr));
-	viewList->addItem("\n\n##############");
+	viewList->appendPlainText(QString::fromStdString(addStr));
+	viewList->ensureCursorVisible();
 }
 
 void MainWindow::startButtonClick()

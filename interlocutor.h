@@ -4,8 +4,6 @@
 #include <string>
 #include "visa.h"
 #include "visatype.h"
-#include "TekVisa.h"
-#include "vpptype.h"
 
 using namespace std;
 

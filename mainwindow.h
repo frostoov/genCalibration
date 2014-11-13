@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLineEdit>
-#include <QListWidget>
+#include <QPlainTextEdit>
 #include <QBoxLayout>
 #include <QDialog>
 #include <QLabel>
@@ -20,7 +20,7 @@ typedef struct
 	string leftFront, rightFront, interval, width, ampStart, ampEnd, ampStep;
 } memoryGUI_t;
 
-class MainWindow : public QDialog
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
@@ -28,10 +28,11 @@ public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 private:
+	QWidget		*centralWidget;
 	QPushButton *startButton, *exitButton, *goButton, *endButton, *applyButton, *stopButton;
 	QLineEdit	*leftFrontEdit, *rightFrontEdit, *intervalEdit, *widthEdit, *ampStartEdit;
 	QLineEdit	*ampStepEdit, *ampEndEdit;
-	QListWidget *viewList;
+	QPlainTextEdit *viewList;
 	QHBoxLayout *mainHLayout, *controlHLayout, *settingsHLayout;
 	QVBoxLayout *rightVLayout, *editVLayout, *goApplyVLayout;
 	QLabel		*leftFrontLabel, *rightFrontLabel, *intervalLabel, *widthLabel, *ampStartLabel;
@@ -41,7 +42,7 @@ private:
 
 	void		initializeElements();
 	void		initializeLayouts();
-	void		addToList(const string& addStr);
+	inline void	addToList(const string& addStr);
 	void		readFromMemory(const int& numberChannel);
 	void		writeToMemory(const int& numberChannel);
 
