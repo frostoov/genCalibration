@@ -11,14 +11,13 @@
 #include <QRadioButton>
 #include <QTimer>
 #include <string>
+
+
 #include "tekmodule.h"
+#include "tekoutput.h"
+#include "teksettings.h"
 
 using namespace std;
-
-typedef struct
-{
-	string leftFront, rightFront, interval, width, ampStart, ampEnd, ampStep;
-} memoryGUI_t;
 
 class MainWindow : public QMainWindow
 {
@@ -29,36 +28,25 @@ public:
 	~MainWindow();
 private:
 	QWidget		*centralWidget;
-	QPushButton *startButton, *exitButton, *goButton, *endButton, *applyButton, *stopButton;
-	QLineEdit	*leftFrontEdit, *rightFrontEdit, *intervalEdit, *widthEdit, *ampStartEdit;
-	QLineEdit	*ampStepEdit, *ampEndEdit;
-	QPlainTextEdit *viewList;
+	QPushButton *startButton;
+	QPushButton	*exitButton;
+	QPushButton *endButton;
 	QHBoxLayout *mainHLayout, *controlHLayout, *settingsHLayout;
-	QVBoxLayout *rightVLayout, *editVLayout, *goApplyVLayout;
-	QLabel		*leftFrontLabel, *rightFrontLabel, *intervalLabel, *widthLabel, *ampStartLabel;
-	QLabel		*ampStepLabel, *ampEndLabel;
-	QRadioButton	*channelOneButton, *channelTwoButton;
-	QTimer		*goTimer;
+	QVBoxLayout *rightVLayout, *goApplyVLayout;
 
 	void		initializeElements();
 	void		initializeLayouts();
-	inline void	addToList(const string& addStr);
-	void		readFromMemory(const int& numberChannel);
-	void		writeToMemory(const int& numberChannel);
+	inline void	addToList		(const string& addStr);
+	void		readFromMemory	(const int& numberChannel);
+	void		writeToMemory	(const int& numberChannel);
 
-	tekModule	converVi;
-	memoryGUI_t		oneChannelMemory, twoChannelMemory;
-	double			amp, ampStep, ampEnd;
+	tekModule	*module;
+	tekOutput	*output;
+	tekSettings *settings;
 private slots:
 	void		startButtonClick();
 	void		endButtonClick();
-	void		applyButtonClick();
-	void		goButtonClick();
-	void		chooseOneChannel()		{readFromMemory(1);}
-	void		chooseTwoChannel()		{readFromMemory(2);}
-	void		stopButtonClick();
 	void		changeSettings();
-	void		returnSettings();
 };
 
 #endif // MAINWINDOW_H

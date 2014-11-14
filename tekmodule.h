@@ -13,21 +13,25 @@ using namespace std;
 
 class tekModule : public Subject
 {
+	typedef queue<actionInfo_s>	 actionQueue;
+
 public:
+	enum interest
+	{statusUpdate};
 	tekModule();
 	bool		openSession	();
 	bool		closeSession();
-	bool		setPing				(const int& mSec);
-	bool		setWidth			(const int& mSec);
-	bool		setFrequency		(const int& freq);
-	bool		setAmplitude		(const int& amp);
-	bool		setCountSignals		(const int& count);
-	bool		setLeftFront		(const int& leftFront);
-	bool		setRightFront		(const int& rightFront);
-	bool		setInterval			(const int& interval);
-	void		setChannel			(const int& channel);
-	bool		setDefaultSettings	(const int &channel);
-	bool		activateChannel		(const bool& statusChannel);
+	bool		setPing				(int mSec);
+	bool		setWidth			(int mSec);
+	bool		setFrequency		(int freq);
+	bool		setAmplitude		(int amp);
+	bool		setCountSignals		(int count);
+	bool		setLeftFront		(int leftFront);
+	bool		setRightFront		(int rightFront);
+	bool		setInterval			(int interval);
+	void		setChannel			(int channel);
+	bool		setDefaultSettings	(int channel);
+	bool		activateChannel		(bool statusChannel);
 
 	string		getWidth()			const;
 	string		getAmplitude()		const;
@@ -35,16 +39,22 @@ public:
 	string		getRightFront()		const;
 	string		getInterval()		const;
 	string		whoYou();
+
+	ViSession	resMN()		const	{return _resMN;}
+	ViSession	session()	const	{return _session;}
+	actionQueue &getActions()		{return actions;}
+
 protected:
-	void pushAction(tekActions action,ViStatus status);
+	void		pushAction(tekActions action,ViStatus status);
+	ViStatus	write(const string &text) const;
 private:
 
-	bool					active;
-	ViSession				_mainSession;
-	ViSession				_thisSession;
-	ViFindList				_mainFList;
-	int						_channel;
-	queue<actionInfo_s>		actions;
+	bool		active;
+	ViSession	_resMN;
+	ViSession	_session;
+	ViFindList	_mainFList;
+	int			_channel;
+	actionQueue	actions;
 };
 
 #endif // INTERLOCUTOR_H
