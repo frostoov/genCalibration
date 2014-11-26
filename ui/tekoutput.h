@@ -7,16 +7,17 @@
 #include <fstream>
 #include "mutex"
 
-#include "observer.h"
-#include "tekmodule.h"
-#include "tektypes.h"
-#include "visa.h"
+#include "observer/observer.h"
+#include "tekVisa/tekmodule.h"
+#include "types.hpp"
 
 using namespace std;
 
 class tekOutput : public QPlainTextEdit,public Observer
 {
 	Q_OBJECT
+	typedef tekVisa::genModule tekModule;
+	typedef tekVisa::actionInfo_s actionInfo_s;
 public:
 	explicit tekOutput(tekModule *sub, QWidget *parent = 0);
 	~tekOutput();
@@ -29,7 +30,6 @@ protected:
 	QString		getDate			(const QDateTime &dt);
 	QString		getTime			(const QDateTime &tm);
 	QString		getDataTime		(const QDateTime &tmdt);
-	const char*	decodeAction	(tekActions op) const;
 private:
 	mutex		outputLock;
 	tekModule	*_module;

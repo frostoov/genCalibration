@@ -12,8 +12,6 @@
 #include <QTimer>
 #include <string>
 
-
-#include "tekmodule.h"
 #include "tekoutput.h"
 #include "teksettings.h"
 

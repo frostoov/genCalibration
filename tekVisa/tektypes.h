@@ -2,28 +2,30 @@
 #define TEKTYPES_H
 
 #include <string>
-#include "visatype.h"
+#include "visa/visatype.h"
 
-using namespace std;
+namespace tekVisa {
 
-struct tekSettings_t
+class genModule;
+
+struct genSettings_t
 {
 	int leftFront;
 	int rightFront;
 	int interval;
 	int width;
-	int amplitude;
-	int ampEnd;
-	int ampStep;
+	int highLevel;
+	int lowLevel;
 	int ping;
+	int activeChannel;
 	int countSignals;
 	int frequency;
-	int activeChannels;
 };
 
-enum class tekActions
+enum class genActions
 {
 	init,
+	close,
 	setWidth,
 	setPing,
 	setLeftFront,
@@ -35,16 +37,24 @@ enum class tekActions
 	setInterval,
 	setChannel,
 	setDefaultSettings,
-	activateChannel
+	activateChannel,
+	getWidth,
+	getAmplitudeHigh,
+	getAmplitudeLow,
+	getLeftFront,
+	getRightFront,
+	getInterval
 };
 
 struct actionInfo_s
 {
 	actionInfo_s(){}
-	actionInfo_s(tekActions act,ViStatus err)
+	actionInfo_s(genActions act,ViStatus err)
 		: actCode(act),errCode(err){}
-	tekActions	actCode;
+	genActions	actCode;
 	ViStatus	errCode;
 };
+
+}
 
 #endif // TEKTYPES_H

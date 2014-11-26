@@ -10,10 +10,9 @@
 
 #include <iostream>
 
-#include "observer.h"
-#include "tekmodule.h"
-#include "tektypes.h"
-#include "visa.h"
+#include "observer/observer.h"
+#include "tekVisa/tekmodule.h"
+#include "types.hpp"
 
 using namespace std;
 
@@ -26,6 +25,8 @@ public:
 	int currentChannel () {return channel;}
 	void obsUpdate(const Subject *subject);
 
+	void setHighLevel();
+	void setLowLevel();
 protected:
 	void	setSettings();
 	void	writeSettings();
@@ -38,11 +39,10 @@ protected:
 	void setRightFront();
 	void setInterval();
 	void setWidth();
-	void setAmplitude();
 	void setChannel();
+	void updateSettings();
 private:
 	tekModule		*_module;
-	tekSettings_t	settings[2];
 	int channel;
 
 	QFormLayout *layout;
@@ -50,13 +50,12 @@ private:
 	QRadioButton *channelOneC;
 	QRadioButton *channelTwoC;
 
-	QLineEdit	*leftFrontEdit;
-	QLineEdit	*rightFrontEdit;
-	QLineEdit	*intervalEdit;
-	QLineEdit	*widthEdit;
-	QLineEdit	*amplitudeEdit;
-	QLineEdit	*ampStepEdit;
-	QLineEdit	*ampEndEdit;
+	QLineEdit	*leftFrontL;
+	QLineEdit	*rightFrontL;
+	QLineEdit	*intervalL;
+	QLineEdit	*widthL;
+	QLineEdit	*lowLevelL;
+	QLineEdit   *highLevelL;
 };
 
 #endif // TEKSETTINGS_H

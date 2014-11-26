@@ -12,6 +12,7 @@ tekOutput::tekOutput(tekModule *mod, QWidget *parent)
 
 tekOutput::~tekOutput()
 {
+	print("Closing tekControl");
 	if(logStream.is_open())
 		logStream.close();
 }
@@ -38,46 +39,14 @@ void tekOutput::print(const QString &text)
 	outputLock.unlock();
 }
 
-
-const char* tekOutput::decodeAction(tekActions op) const
-{
-	if(op == tekActions::init)
-		return (const char*)"Init";
-	if(op == tekActions::activateChannel)
-		return (const char*)"Activate Channel";
-	if(op == tekActions::setAmplitudeHigh)
-		return (const char*)"Set Amplitude[High]";
-	if(op == tekActions::setAmplitudeLow)
-		return (const char*)"Set Amplitude[Low]";
-	if(op == tekActions::setChannel)
-		return (const char*)"Set Channel";
-	if(op == tekActions::setCountSignals)
-		return (const char*)"Set Count Signals";
-	if(op == tekActions::setDefaultSettings)
-		return (const char*)"Set Default Settings";
-	if(op == tekActions::setFrequency)
-		return (const char*)"Set Frequency";
-	if(op == tekActions::setInterval)
-		return (const char*)"Set Interval";
-	if(op == tekActions::setLeftFront)
-		return (const char*)"Set Left Front";
-	if(op == tekActions::setPing)
-		return (const char*)"Set Ping";
-	if(op == tekActions::setRightFront)
-		return (const char*)"Set Right Front";
-	if(op == tekActions::setWidth)
-		return (const char*)"Set Width";
-	return (const char*)"";
-}
-
 void tekOutput::printAction(const actionInfo_s &act)
 {
 	if(act.errCode == VI_SUCCESS)
 		print(getDataTime(QDateTime::currentDateTime()) + tr("\t") +
-			  tr("%1 - OK").arg(decodeAction(act.actCode)) );
+			  tr("%1 - OK").arg(_module->decodeAction(act.actCode)) );
 	else
 		print(getDataTime(QDateTime::currentDateTime()) +tr("\t") +
-			  tr("%1 - FAILED").arg(decodeAction(act.actCode)) );
+			  tr("%1 - FAILED").arg(_module->decodeAction(act.actCode)) );
 	ensureCursorVisible();
 }
 

@@ -33,16 +33,19 @@ MainWindow::~MainWindow()
 	disconnect(endButton,		&QPushButton::clicked,
 			this,				&MainWindow::endButtonClick);
 
+	delete module;
+	delete output;
+	delete settings;
 	delete startButton;
 	delete endButton;
 	delete exitButton;
 
-	delete settingsHLayout;
-	delete controlHLayout;
-	delete rightVLayout;
-	delete mainHLayout;
+//	delete settingsHLayout;
+//	delete controlHLayout;
+//	delete rightVLayout;
+//	delete mainHLayout;
 
-	delete centralWidget;
+//	delete centralWidget;
 }
 
 void MainWindow::initializeLayouts()
@@ -67,9 +70,9 @@ void MainWindow::initializeLayouts()
 
 void MainWindow::initializeElements()
 {
-	startButton =		new QPushButton("Start session",this);
-	endButton =			new QPushButton("End session",this);
-	exitButton =		new QPushButton("Exit",this);
+	startButton =	new QPushButton("Start session",this);
+	endButton =		new QPushButton("End session",this);
+	exitButton =	new QPushButton("Exit",this);
 }
 
 void MainWindow::addToList(const string &addStr)
@@ -81,21 +84,14 @@ void MainWindow::addToList(const string &addStr)
 void MainWindow::startButtonClick()
 {
 	module->setChannel( settings->currentChannel() );
-
-	if (module->openSession())
-	{
-		module->setDefaultSettings(1);
-		module->setDefaultSettings(2);
-	}
+	module->openSession();
 	module->notify(tekModule::statusUpdate);
 }
 
 void MainWindow::endButtonClick()
 {
-	if (module->closeSession() == false)
-		addToList("Close session is failed");
-	else
-		addToList("Close session successfully");
+	module->closeSession();
+	module->notify(tekModule::statusUpdate);
 }
 
 //void MainWindow::goButtonClick()

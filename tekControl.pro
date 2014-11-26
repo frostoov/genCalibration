@@ -13,34 +13,29 @@ TEMPLATE	= app
 CONFIG		+= c++11
 
 SOURCES += \
-	main.cpp\
-	mainwindow.cpp \
-    observer.cpp \
-    teksettings.cpp \
-    tekmodule.cpp \
-    tekoutput.cpp
+	observer/observer.cpp \
+	tekVisa/tekmodule.cpp \
+	ui/main.cpp \
+	ui/mainwindow.cpp \
+	ui/tekoutput.cpp \
+	ui/teksettings.cpp
 
 HEADERS  += \
-	mainwindow.h \
-    visa.h \
-    visatype.h \
-    observer.h \
-    teksettings.h \
-    tekmodule.h \
-    tektypes.h \
-    tekoutput.h
+	observer/observer.h \
+	tekVisa/tekmodule.h \
+	tekVisa/tektypes.h \
+	ui/mainwindow.h \
+	ui/tekoutput.h \
+	ui/teksettings.h \
+	visa/visa.h \
+	visa/visatype.h \
+    ui/types.hpp
 
-linux{
-	LIBS        +=	-L$$PWD/lib/ -lvisa
-	INCLUDEPATH +=	  $$PWD/lib/
-}
-windows{
-	LIBS += -L$$PWD/dll/Visa32.dll
-	LIBS += -L$$PWD/dll/tkVisa32.dll
-}
+LIBS        +=	-L$$PWD/lib/ -lvisa
+INCLUDEPATH +=	  $$PWD/lib/
 
 release {
 	QMAKE_CXXFLAGS_RELEASE	-= -O1
 	QMAKE_CXXFLAGS_RELEASE	-= -O2
-	QMAKE_CXXFLAGS_RELEASE	*= -O3
+	QMAKE_CXXFLAGS_RELEASE	+= -O3
 }
