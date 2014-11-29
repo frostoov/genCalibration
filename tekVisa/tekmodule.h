@@ -4,10 +4,13 @@
 #include <string>
 #include <queue>
 #include <sstream>
+#include <thread>
 #include "visa/visa.h"
 #include "visa/visatype.h"
 #include "observer/observer.h"
 #include "tektypes.h"
+
+#include "muons/muons_2012.h"
 
 namespace tekVisa {
 
@@ -40,6 +43,7 @@ public:
 	bool getInterval	(int &interval);
 	bool getHighLevel	(int &val);
 	bool getLowLevel	(int &val);
+	int  getChannelActive()	const;
 
 	string		whoYou();
 

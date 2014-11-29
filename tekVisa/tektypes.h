@@ -2,6 +2,7 @@
 #define TEKTYPES_H
 
 #include <string>
+#include <vector>
 #include "visa/visatype.h"
 
 namespace tekVisa {

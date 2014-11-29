@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
 	module	= new tekModule;
+	chip	= new chipModule	(module);
 	output	= new tekOutput		(module,this);
 	settings= new tekSettings	(module,tr("Settings"),this);
 
@@ -19,9 +20,12 @@ MainWindow::MainWindow(QWidget *parent)
 			this,			&MainWindow::startButtonClick);
 	connect(endButton,		&QPushButton::clicked,
 			this,			&MainWindow::endButtonClick);
+	connect(goButton,		&QPushButton::clicked,
+			this,			&MainWindow::goButtonClick);
 
 	module->attach(output,tekModule::statusUpdate);
 	module->attach(settings,tekModule::statusUpdate);
+	chip->attach(output, chipModule::statusUpdate);
 }
 
 MainWindow::~MainWindow()
@@ -32,6 +36,9 @@ MainWindow::~MainWindow()
 			this,				&MainWindow::startButtonClick);
 	disconnect(endButton,		&QPushButton::clicked,
 			this,				&MainWindow::endButtonClick);
+	disconnect(goButton,		&QPushButton::clicked,
+			this,				&MainWindow::goButtonClick);
+
 
 	delete module;
 	delete output;
@@ -39,6 +46,7 @@ MainWindow::~MainWindow()
 	delete startButton;
 	delete endButton;
 	delete exitButton;
+	delete goButton;
 
 //	delete settingsHLayout;
 //	delete controlHLayout;
@@ -60,6 +68,7 @@ void MainWindow::initializeLayouts()
 	goApplyVLayout =	new QVBoxLayout;
 	settingsHLayout->	addLayout(goApplyVLayout);
 	controlHLayout->	addWidget(startButton);
+	controlHLayout->	addWidget(goButton);
 	controlHLayout->	addWidget(endButton);
 	controlHLayout->	addWidget(exitButton);
 	rightVLayout->		addLayout(controlHLayout);
@@ -71,6 +80,7 @@ void MainWindow::initializeLayouts()
 void MainWindow::initializeElements()
 {
 	startButton =	new QPushButton("Start session",this);
+	goButton =		new QPushButton("Go Calibration", this);
 	endButton =		new QPushButton("End session",this);
 	exitButton =	new QPushButton("Exit",this);
 }
@@ -83,9 +93,10 @@ void MainWindow::addToList(const string &addStr)
 
 void MainWindow::startButtonClick()
 {
-	module->setChannel( settings->currentChannel() );
+	module->setChannel( settings->currentChannel() + 1);
 	module->openSession();
 	module->notify(tekModule::statusUpdate);
+	chip->openSession();
 }
 
 void MainWindow::endButtonClick()
@@ -94,37 +105,13 @@ void MainWindow::endButtonClick()
 	module->notify(tekModule::statusUpdate);
 }
 
-//void MainWindow::goButtonClick()
-//{
-//	if (channelOneButton->isChecked() == true)
-//		module->setChannel(1);
-//	if (channelTwoButton->isChecked() == true)
-//		module->setChannel(2);
-//	module->activateChannel(true);
-//	amp =		ampStartEdit->text().toDouble();
-//	ampEnd =	ampEndEdit->text().toDouble();
-//	ampStep =	ampStepEdit->text().toDouble();
-//	goTimer->start(10);
-//}
-
-//void MainWindow::stopButtonClick()
-//{
-//	if (channelOneButton->isChecked() == true)
-//		module->setChannel(1);
-//	if (channelTwoButton->isChecked() == true)
-//		module->setChannel(2);
-//	module->activateChannel(false);
-//	goTimer->stop();
-//}
-
-void MainWindow::changeSettings()
+void MainWindow::goButtonClick()
 {
-//	amp += ampStep;
-//	if (amp > ampEnd)
-//	{
-//		goTimer->stop();
-//		module->activateChannel(false);
-//		return;
-//	}
-//	module->setAmplitude(amp);
+
 }
+
+void MainWindow::saveResultToFile()
+{
+
+}
+

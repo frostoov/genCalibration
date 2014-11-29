@@ -66,6 +66,7 @@ bool genModule::openSession()
 	}
 	active = true;
 	pushAction(genActions::init,VI_SUCCESS);
+//	startMainBlock();
 	return true;
 }
 
@@ -469,6 +470,11 @@ const char* genModule::decodeAction(genActions op) const
 	if(op == genActions::setWidth)
 		return (const char*)"Set Width";
 	return (const char*)"";
+}
+
+int genModule::getChannelActive()	const
+{
+	return _channel;
 }
 
 }
