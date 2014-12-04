@@ -21,9 +21,9 @@ class tekOutput : public QPlainTextEdit,public Observer
 public:
 	explicit tekOutput(tekModule *sub, QWidget *parent = 0);
 	~tekOutput();
-	void printAction		(const actionInfo_s &act);
-	void printInfo			(const actionInfo_s &tdcAction,int16_t data);
-	void obsUpdate			(const Subject *subject);
+	void		printAction		(const actionInfo_s &act);
+	void		printInfo		(const actionInfo_s &tdcAction,int16_t data);
+	void		obsUpdate		(const Subject *subject);
 protected:
 	void		print			(const QString& text);
 	void		printDate();

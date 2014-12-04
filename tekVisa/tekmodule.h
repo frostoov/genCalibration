@@ -10,7 +10,7 @@
 #include "observer/observer.h"
 #include "tektypes.h"
 
-#include "muons/muons_2012.h"
+#include "chip/defines.h"
 
 namespace tekVisa {
 

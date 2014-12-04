@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include <thread>
 
 using namespace std;
 
@@ -9,10 +10,16 @@ MainWindow::MainWindow(QWidget *parent)
 	chip	= new chipModule	(module);
 	output	= new tekOutput		(module,this);
 	settings= new tekSettings	(module,tr("Settings"),this);
+	plots	= new plotsOutput	(chip, this);
 
 	initializeElements();
 	initializeLayouts();
-	centralWidget->setLayout(mainHLayout);
+	centralWidget->setLayout(addPlotsVLayout);
+//	mainHLayout->setSizeConstraint(QLayout::SetFixedSize);
+	output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+//	addPlotsVLayout->setSizeConstraint(QLayout::SetFixedSize);
+//	centralWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	centralWidget->setFixedSize(1024, 1024);
 
 	connect(exitButton,		&QPushButton::clicked,
 			this,			&MainWindow::close);
@@ -22,10 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
 			this,			&MainWindow::endButtonClick);
 	connect(goButton,		&QPushButton::clicked,
 			this,			&MainWindow::goButtonClick);
+	connect(showSettings,	&QPushButton::clicked,
+			this,			&MainWindow::showSettingsClick);
 
 	module->attach(output,tekModule::statusUpdate);
 	module->attach(settings,tekModule::statusUpdate);
 	chip->attach(output, chipModule::statusUpdate);
+	chip->attach(plots, chipModule::statusUpdate);
 }
 
 MainWindow::~MainWindow()
@@ -38,8 +48,12 @@ MainWindow::~MainWindow()
 			this,				&MainWindow::endButtonClick);
 	disconnect(goButton,		&QPushButton::clicked,
 			this,				&MainWindow::goButtonClick);
+	disconnect(showSettings,	&QPushButton::clicked,
+			this,				&MainWindow::showSettingsClick);
 
 
+	delete showSettings;
+	delete plots;
 	delete module;
 	delete output;
 	delete settings;
@@ -47,6 +61,7 @@ MainWindow::~MainWindow()
 	delete endButton;
 	delete exitButton;
 	delete goButton;
+	delete pathToSaveL;
 
 //	delete settingsHLayout;
 //	delete controlHLayout;
@@ -66,15 +81,21 @@ void MainWindow::initializeLayouts()
 	controlHLayout =	new QHBoxLayout;
 	settingsHLayout =	new QHBoxLayout;
 	goApplyVLayout =	new QVBoxLayout;
+	addPlotsVLayout =	new QVBoxLayout;
 	settingsHLayout->	addLayout(goApplyVLayout);
 	controlHLayout->	addWidget(startButton);
+	controlHLayout->	addWidget(showSettings);
 	controlHLayout->	addWidget(goButton);
 	controlHLayout->	addWidget(endButton);
 	controlHLayout->	addWidget(exitButton);
 	rightVLayout->		addLayout(controlHLayout);
+	rightVLayout->		addWidget(pathToSaveL);
+	rightVLayout->		addWidget(numberChipL);
 	rightVLayout->		addWidget(settings);
 	mainHLayout->		addWidget(output);
 	mainHLayout->		addLayout(rightVLayout);
+	addPlotsVLayout->	addLayout(mainHLayout);
+	addPlotsVLayout->	addWidget(plots);
 }
 
 void MainWindow::initializeElements()
@@ -83,6 +104,9 @@ void MainWindow::initializeElements()
 	goButton =		new QPushButton("Go Calibration", this);
 	endButton =		new QPushButton("End session",this);
 	exitButton =	new QPushButton("Exit",this);
+	showSettings =	new QPushButton("Show Settings", this);
+	numberChipL =	new QLineEdit(this);
+	pathToSaveL =	new QLineEdit("/home/main/log/", this);
 }
 
 void MainWindow::addToList(const string &addStr)
@@ -102,16 +126,28 @@ void MainWindow::startButtonClick()
 void MainWindow::endButtonClick()
 {
 	module->closeSession();
+	chip->closeSession();
 	module->notify(tekModule::statusUpdate);
+}
+
+void MainWindow::showSettingsClick()
+{
+	if (settings->isHidden() == true)
+		settings->show();
+	else
+		settings->hide();
 }
 
 void MainWindow::goButtonClick()
 {
+	string helpToSave(pathToSaveL->text().toStdString());
+	chip->ampCalibration(10);
+	helpToSave += pathToSaveL->text().toStdString();
+	QDir().mkdir(QString::fromStdString(helpToSave));
+	chip->saveToFileAmp(helpToSave += "log");
 
+	chip->threshCalibration(100);
+	chip->saveToFileThresh(helpToSave += "Thresh");
 }
 
-void MainWindow::saveResultToFile()
-{
-
-}
 

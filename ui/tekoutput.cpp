@@ -17,7 +17,6 @@ tekOutput::~tekOutput()
 		logStream.close();
 }
 
-
 void tekOutput::obsUpdate(const Subject *subject)
 {
 	if(subject == _module)

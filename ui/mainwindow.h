@@ -9,13 +9,13 @@
 #include <QDialog>
 #include <QLabel>
 #include <QRadioButton>
-#include <QTimer>
 #include <string>
 
 #include "tekoutput.h"
 #include "teksettings.h"
+#include "plots.h"
 
-#include "muons/muons_2012.h"
+#include "chip/blocks.h"
 
 using namespace std;
 
@@ -32,8 +32,11 @@ private:
 	QPushButton *goButton;
 	QPushButton	*exitButton;
 	QPushButton *endButton;
+	QPushButton	*showSettings;
+	QLineEdit	*pathToSaveL;
+	QLineEdit	*numberChipL;
 	QHBoxLayout *mainHLayout, *controlHLayout, *settingsHLayout;
-	QVBoxLayout *rightVLayout, *goApplyVLayout;
+	QVBoxLayout *rightVLayout, *goApplyVLayout, *addPlotsVLayout;
 
 	void		initializeElements();
 	void		initializeLayouts();
@@ -41,16 +44,17 @@ private:
 	void		readFromMemory	(const int& numberChannel);
 	void		writeToMemory	(const int& numberChannel);
 
-	void		saveResultToFile();
-
 	tekModule	*module;
 	tekOutput	*output;
 	tekSettings *settings;
 	chipModule	*chip;
+	plotsOutput	*plots;
+
 private slots:
 	void		startButtonClick();
 	void		goButtonClick();
 	void		endButtonClick();
+	void		showSettingsClick();
 };
 
 #endif // MAINWINDOW_H

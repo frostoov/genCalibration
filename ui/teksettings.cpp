@@ -22,7 +22,6 @@ tekSettings::~tekSettings()
 			this,			&tekSettings::setHighLevel);
 	disconnect(lowLevelL,	&QLineEdit::editingFinished,
 			this,			&tekSettings::setLowLevel);
-
 	disconnect(channelOneC,	&QRadioButton::clicked,
 			   this,		&tekSettings::setChannel);
 	disconnect(channelTwoC,	&QRadioButton::clicked,
@@ -34,6 +33,9 @@ tekSettings::~tekSettings()
 	delete  rightFrontL;
 	delete  intervalL;
 	delete  widthL;
+	delete	ampStartL;
+	delete	ampEndL;
+	delete	ampStepL;
 	delete	layout;
 	delete	chipLayout;
 	delete  mainLayout;
@@ -45,8 +47,11 @@ void tekSettings::createWidgets()
 	rightFrontL		= new QLineEdit("0", this);
 	intervalL		= new QLineEdit("0", this);
 	widthL			= new QLineEdit("0", this);
-	highLevelL		= new QLineEdit("0",this);
-	lowLevelL		= new QLineEdit("0",this);
+	highLevelL		= new QLineEdit("0", this);
+	lowLevelL		= new QLineEdit("0", this);
+	ampStartL		= new QLineEdit("0", this);
+	ampEndL			= new QLineEdit("0", this);
+	ampStepL		= new QLineEdit("0", this);
 	channelOneC		= new QRadioButton(this);
 	channelTwoC		= new QRadioButton(this);
 
@@ -84,6 +89,9 @@ void tekSettings::createLayouts()
 	layout->addRow(tr("Width"),widthL);
 	layout->addRow(tr("High Level"),highLevelL);
 	layout->addRow(tr("Low Level"),lowLevelL);
+	layout->addRow(tr("Start Level"), ampStartL);
+	layout->addRow(tr("End Level"), ampEndL);
+	layout->addRow(tr("Step Level"), ampStepL);
 	chipLayout			= new QVBoxLayout;
 	for (int i = 0; i < (signed)chipChannel.size(); i++)
 		chipLayout->addWidget(chipChannel[i]);
@@ -111,7 +119,6 @@ void tekSettings::updateSettings()
 			countCheck++;
 	if (countCheck != 2)
 		return;
-
 
 	if( _module->getWidth(val) )
 		widthL->setText(QString::number(val,10));
@@ -190,6 +197,7 @@ void tekSettings::setSettings()
 	_module->setLowLevel	( lowLevelL->text().toInt() );
 	_module->setInterval	( intervalL->text().toInt() );
 	_module->setWidth		( widthL->text().toInt() );
+
 }
 
 void tekSettings::readSettings()
@@ -208,3 +216,15 @@ int tekSettings::getCurrentChannel()
 	if(channelTwoC->isChecked()) return 1;
 	return -1;
 }
+
+vector<char> tekSettings::getChipChannel()	const
+{
+	vector<char> result(4);
+	for (int i = 0; i < (signed)chipChannel.size(); i++)
+		if (chipChannel[i]->isChecked() == true)
+			result[i] = '1';
+		else
+			result[i] = '0';
+	return result;
+}
+

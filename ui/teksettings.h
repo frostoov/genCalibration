@@ -29,6 +29,7 @@ public:
 
 	void	setHighLevel();
 	void	setLowLevel();
+	vector<char> getChipChannel()	const;
 protected:
 	void	setSettings();
 	void	writeSettings();
@@ -63,6 +64,9 @@ private:
 	QLineEdit				*widthL;
 	QLineEdit				*lowLevelL;
 	QLineEdit				*highLevelL;
+	QLineEdit				*ampStartL;
+	QLineEdit				*ampEndL;
+	QLineEdit				*ampStepL;
 };
 
 #endif // TEKSETTINGS_H

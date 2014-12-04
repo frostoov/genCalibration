@@ -433,6 +433,7 @@ ViStatus genModule::read(const string &request,string &answer)
 		status = viRead(_session, (ViPBuf)buff, 256, &retCount);
 		if(status == VI_SUCCESS)
 		{
+			cout << "readOperation: " << buff << endl;
 			buff[retCount - 4] = '\0';
 			answer = string(buff);
 		}

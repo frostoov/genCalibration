@@ -23,6 +23,13 @@ struct genSettings_t
 	int frequency;
 };
 
+struct calibrSettings_t
+{
+	int ampStart;
+	int ampEnd;
+	int ampStep;
+};
+
 enum class genActions
 {
 	init,

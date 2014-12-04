@@ -1,4 +1,5 @@
 #include "chipmodule.h"
+#include <iostream>
 
 chipModule::chipModule(genModule *tekMod)
 {
@@ -16,7 +17,6 @@ bool chipModule::openSession()
 	char host[] = "192.168.1.89";
 	Connect(host, sizeof(host));
 	sleep(2);
-	_exchange = startMainBlock(nnn, _thresh, 1);
 	return true;
 }
 
@@ -47,10 +47,8 @@ int chipModule::sendOneSignal(int amp)
 {
 	_module->setLowLevel(0);
 	_module->setHighLevel(amp);
-//	setInterval(1000);
 	_module->activateChannel(true);
-//	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	vector<int> max = sniffMainBlock(_exchange);
+	vector<int> max = sniffMainBlockSignals(nnn, _thresh, 1, 1);
 	_module->activateChannel(false);
 	int howChipChannel = returnChipChannel();
 	return max[howChipChannel];
@@ -65,8 +63,10 @@ void chipModule::sendLongSignal(int ampStart, int ampEnd, int ampStep)
 	_module->activateChannel(true);
 	for (int ampGo = ampStart + ampStep; ampGo <= ampEnd; ampGo += ampStep)
 	{
-		vector<int> max = sniffMainBlock(_exchange);
+		_module->setHighLevel(ampGo);
+		vector<int> max = sniffMainBlockThree(nnn, 1, 1);
 		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
+		cout << "ampGo: " << ampGo << endl;
 	}
 	_module->activateChannel(false);
 }
@@ -95,4 +95,86 @@ int chipModule::returnChipChannel()	const
 				break;
 			}
 	return howChipChannelChoose;
+}
+
+void chipModule::saveToFileAmp(const string& pathToFile)
+{
+	ofstream saveFile(pathToFile);
+	for (int i = 0; i < (signed)_calibr.size(); i++)
+		saveFile << _calibr[i].first << "\t" << _calibr[i].second << endl;
+	saveFile.close();
+}
+
+void chipModule::setSettings(int channel, int ampStart, int ampEnd, int ampStep)
+{
+	settings[channel].ampStart	= ampStart;
+	settings[channel].ampEnd	= ampEnd;
+	settings[channel].ampStep	= ampStep;
+}
+
+void chipModule::ampCalibration(int step)
+{
+	activeMode = chipModule::mode::ampFirst;
+	setThresh(0, 10);
+	_calibr.clear();
+	int howChipChannel = returnChipChannel();
+	_module->setLowLevel(0);
+	_module->setHighLevel(20);
+	_module->activateChannel(true);
+	for (int ampGo = 20; ampGo <= 9900; ampGo += step)
+	{
+		_module->setHighLevel(ampGo);
+		vector<int> max = sniffMainBlockThree(nnn, 1, 1);
+		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
+		this->notify(chipModule::statusUpdate);
+		cout << "ampGo: " << ampGo << endl;
+	}
+	_module->activateChannel(false);
+}
+
+int chipModule::searchThresh()
+{
+	sendLongSignal(100, 9900, 100);
+	for (int i = 0; i < _calibr.size() - 3; i++)
+		if (_calibr[i].second > 0 && _calibr[i + 1].second > 0 && _calibr[i + 2].second > 0)
+			return _calibr[i].first;
+	return -1;
+}
+
+void chipModule::threshCalibration(int step)
+{
+	activeMode = chipModule::mode::form;
+	for (int threshGo = 100; threshGo < 140; threshGo += step)
+	{
+		setThresh(0, threshGo);
+		setThresh(1, threshGo);
+		setThresh(2, threshGo);
+		setThresh(3, threshGo);
+		mountThresh();
+		_threshList.push_back(pair<int, int>(threshGo, searchThresh()));
+		this->notify(chipModule::statusUpdate);
+	}
+}
+
+void chipModule::saveToFileThresh(const string& pathToFile)
+{
+	ofstream saveFile(pathToFile);
+	for (int i = 0; i < (signed)_threshList.size(); i++)
+		saveFile << _threshList[i].first << "\t" << _threshList[i].second << endl;
+	saveFile.close();
+}
+
+chipModule::mode chipModule::returnMode()	const
+{
+	return activeMode;
+}
+
+pair<int, int>	chipModule::returnLastAmp()	const
+{
+	return _calibr.back();
+}
+
+pair<int, int>	chipModule::returnLastThresh()	const
+{
+	return _threshList.back();
 }
