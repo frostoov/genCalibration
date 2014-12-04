@@ -61,8 +61,17 @@ void plotsOutput::obsUpdate(const Subject *subject)
 void plotsOutput::createFirst()
 {
 	ampFirst->addGraph();
+	ampFirst->graph(0)->setPen(QPen(QColor(0, 0, 255, 20)));
 	ampFirst->graph(0)->setLineStyle(QCPGraph::lsNone);
 	ampFirst->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+	ampFirst->graph(0)->setName(QString("First Channel"));
+//	ampFirst->addGraph();
+//	ampFirst->graph(1)->setPen(QPen(QColor(0, 255, 0, 20)));
+//	ampFirst->graph(1)->setLineStyle(QCPGraph::lsNone);
+//	ampFirst->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+//	ampFirst->graph(1)->setName(QString("Second channel"));
+	ampFirst->xAxis->setLabel(QString("Amplitude, mV"));
+	ampFirst->yAxis->setLabel(QString("Code PAA"));
 
 	ampFirst->rescaleAxes();
 
@@ -74,6 +83,9 @@ void plotsOutput::createSecond()
 	ampSecond->addGraph();
 	ampSecond->graph(0)->setLineStyle(QCPGraph::lsNone);
 	ampSecond->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+	ampSecond->xAxis->setLabel(QString("Amplitude, mV"));
+	ampSecond->yAxis->setLabel(QString("Code PAA"));
+	ampSecond->graph(0)->setName(QString("Second Channel"));
 
 	ampSecond->rescaleAxes();
 
@@ -85,6 +97,9 @@ void plotsOutput::createForm()
 	form->addGraph();
 	form->graph(0)->setLineStyle(QCPGraph::lsNone);
 	form->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+	form->xAxis->setLabel(QString("Threshold"));
+	form->yAxis->setLabel(QString("Amplitude, mV"));
+	form->graph(0)->setName(QString("Form"));
 
 	form->rescaleAxes();
 

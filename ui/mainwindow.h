@@ -37,6 +37,7 @@ private:
 	QLineEdit	*numberChipL;
 	QHBoxLayout *mainHLayout, *controlHLayout, *settingsHLayout;
 	QVBoxLayout *rightVLayout, *goApplyVLayout, *addPlotsVLayout;
+	QFormLayout	*saveVLayout;
 
 	void		initializeElements();
 	void		initializeLayouts();

@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	module	= new tekModule;
 	chip	= new chipModule	(module);
-	output	= new tekOutput		(module,this);
+	output	= new tekOutput		(module, chip, this);
 	settings= new tekSettings	(module,tr("Settings"),this);
 	plots	= new plotsOutput	(chip, this);
 
@@ -16,10 +16,14 @@ MainWindow::MainWindow(QWidget *parent)
 	initializeLayouts();
 	centralWidget->setLayout(addPlotsVLayout);
 //	mainHLayout->setSizeConstraint(QLayout::SetFixedSize);
-	output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	rightVLayout->setSizeConstraint(QLayout::SetFixedSize);
+	saveVLayout->setSizeConstraint(QLayout::SetFixedSize);
+	output->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	plots->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 //	addPlotsVLayout->setSizeConstraint(QLayout::SetFixedSize);
 //	centralWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	centralWidget->setFixedSize(1024, 1024);
+	centralWidget->setFixedSize(1024, 768);
+	settings->hide();
 
 	connect(exitButton,		&QPushButton::clicked,
 			this,			&MainWindow::close);
@@ -82,15 +86,17 @@ void MainWindow::initializeLayouts()
 	settingsHLayout =	new QHBoxLayout;
 	goApplyVLayout =	new QVBoxLayout;
 	addPlotsVLayout =	new QVBoxLayout;
+	saveVLayout =		new QFormLayout;
 	settingsHLayout->	addLayout(goApplyVLayout);
 	controlHLayout->	addWidget(startButton);
 	controlHLayout->	addWidget(showSettings);
 	controlHLayout->	addWidget(goButton);
 	controlHLayout->	addWidget(endButton);
 	controlHLayout->	addWidget(exitButton);
+	saveVLayout->		addRow("Path to save folder:", pathToSaveL);
+	saveVLayout->		addRow("Name chip", numberChipL);
 	rightVLayout->		addLayout(controlHLayout);
-	rightVLayout->		addWidget(pathToSaveL);
-	rightVLayout->		addWidget(numberChipL);
+	rightVLayout->		addLayout(saveVLayout);
 	rightVLayout->		addWidget(settings);
 	mainHLayout->		addWidget(output);
 	mainHLayout->		addLayout(rightVLayout);
