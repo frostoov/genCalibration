@@ -3,7 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include "visa/visatype.h"
+
+using namespace std;
 
 namespace tekVisa {
 
@@ -64,5 +67,14 @@ struct actionInfo_s
 };
 
 }
+
+struct dataChip
+{
+	array<int, 4>	transformationADC;
+	array<int, 4>	errorADC;
+	array<int, 4>	nonlinearity;
+	array<int, 2>	transformationDAC;
+	array<int, 2>	errorDAC;
+};
 
 #endif // TEKTYPES_H

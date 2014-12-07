@@ -1,4 +1,5 @@
 #include "blocks.h"
+#include <thread>
 
 exchangeBlock startMainBlock (unsigned long nnn, int *Threshold, int flag )
 {
@@ -912,40 +913,43 @@ std::vector<int> sniffMainBlockThree(unsigned long nnn, int flag, int countSigna
 
 		// ----------------   MAIN CYCLE  -----------
 
-		do {
+		clock_t	time = clock();
 
+		do {
 			ii = 0;
 			Claster = ClasterReady[ii];
 
 			Data = 0;
 
-			Data = GetStatusEvent ( Claster );  // master.c
+			Data = GetStatusEvent ( Claster );
 
-
+			if (clock() - time > 10000)
+				return max;
 			//  ------------   SAVE DATA and RESET ----------
 
 			if ( ( ( Data & 1 ) == 1 ) || ( ( Data & 2 ) == 2 ) ) {
 				slu = 1;   // !!!   Event Ready   !!!
 
-				if ( ( Data & 1 ) == 1 ) {  //   Bank 1
-					Nev[Claster] ++;
-	//				SaveData ( Claster, 0, Nev[Claster], por );  //savedata.c
-					max = SaveDataResult(Claster, 0, Nev[Claster], por);
-					ResetEvent (Claster, 0 );  // master.c
-					NEVENTS++;
-					goSignals++;
-					if (countSignals == goSignals / 2)
-						StopRun = 1;
-				}
+//				if ( ( Data & 1 ) == 1 ) {  //   Bank 1
+//					Nev[Claster] ++;
+//	//				SaveData ( Claster, 0, Nev[Claster], por );  //savedata.c
+////					max = SaveDataResult(Claster, 0, Nev[Claster], por);
+//					ResetEvent (Claster, 0 );  // master.c
+//					NEVENTS++;
+////					goSignals++;
+////					if (countSignals == goSignals / 2)
+////						StopRun = 1;
+//				}
 
 				if ( ( Data & 2 ) == 2 ) {   //  Bank 2
 					Nev[Claster] ++;
 	//				SaveData ( Claster, 1, Nev[Claster], por );  //savedata.c
+//					std::this_thread::sleep_for(std::chrono::milliseconds(99));
 					max = SaveDataResult(Claster, 1, Nev[Claster], por);
 					ResetEvent (Claster, 1 );  // master.c
 					NEVENTS++;
 					goSignals++;
-					if (countSignals == goSignals / 2)
+					if (countSignals == goSignals)
 						StopRun = 1;
 				}
 

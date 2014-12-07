@@ -41,6 +41,7 @@ void plotsOutput::obsUpdate(const Subject *subject)
 		{
 			ampFirstData.first.push_back(_chip->returnLastAmp().first);
 			ampFirstData.second.push_back(_chip->returnLastAmp().second);
+			cout << _chip->returnLastAmp().first << "   " << _chip->returnLastAmp().second << endl;
 			renderFirst();
 		}
 		if (_chip->returnMode() == chipModule::mode::ampSecond)
@@ -61,7 +62,7 @@ void plotsOutput::obsUpdate(const Subject *subject)
 void plotsOutput::createFirst()
 {
 	ampFirst->addGraph();
-	ampFirst->graph(0)->setPen(QPen(QColor(0, 0, 255, 20)));
+//	ampFirst->graph(0)->setPen(QPen(QColor(0, 0, 255, 20)));
 	ampFirst->graph(0)->setLineStyle(QCPGraph::lsNone);
 	ampFirst->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 	ampFirst->graph(0)->setName(QString("First Channel"));
@@ -81,11 +82,12 @@ void plotsOutput::createFirst()
 void plotsOutput::createSecond()
 {
 	ampSecond->addGraph();
-	ampSecond->graph(0)->setLineStyle(QCPGraph::lsNone);
+	ampSecond->graph(0)->setLineStyle(QCPGraph::lsLine);
 	ampSecond->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+	ampSecond->graph(0)->setName(QString("Second Channel"));
 	ampSecond->xAxis->setLabel(QString("Amplitude, mV"));
 	ampSecond->yAxis->setLabel(QString("Code PAA"));
-	ampSecond->graph(0)->setName(QString("Second Channel"));
+//	ampSecond->graph(0)->setName(QString("Second Channel"));
 
 	ampSecond->rescaleAxes();
 

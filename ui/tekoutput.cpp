@@ -39,7 +39,7 @@ void tekOutput::obsUpdate(const Subject *subject)
 void tekOutput::print(const QString &text)
 {
 	outputLock.lock();
-	appendPlainText(text);
+//	appendPlainText(text);
 	if(logStream.is_open())
 		logStream << text.toUtf8().data() << endl;
 	outputLock.unlock();

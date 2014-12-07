@@ -17,6 +17,7 @@ public:
 	explicit plotsOutput(chipModule *chip, QWidget *parent = 0);
 	~plotsOutput();
 	void obsUpdate(const Subject *subject);
+
 private slots:
 	void	renderFirst();
 	void	renderSecond();

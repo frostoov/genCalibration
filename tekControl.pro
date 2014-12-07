@@ -34,7 +34,8 @@ SOURCES += \
     chip/thresholds.c \
     chip/vme-lib.c \
     chip/blocks.cpp \
-    ui/plots.cpp
+    ui/plots.cpp \
+    tekVisa/processing.cpp
 
 
 
@@ -59,12 +60,15 @@ HEADERS  += \
     chip/vme.h \
     chip/blocks.h \
     ui/plots.h  \
-    qcustomplot.h
+    qcustomplot.h \
+    tekVisa/processing.h
 
 
 
-LIBS        +=  -L$$PWD/lib/ -lqcustomplot
-LIBS        +=	-L$$PWD/lib/ -lvisa
+#LIBS        +=  -L$$PWD/lib/ -lqcustomplot
+#LIBS        +=	-L$$PWD/lib/ -lvisa
+LIBS         += -lvisa
+LIBS         += -lqcustomplot
 INCLUDEPATH +=	  $$PWD/lib/
 
 INCLUDEPATH +=  $$PWD/qcustomplot/
