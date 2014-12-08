@@ -29,10 +29,9 @@ HEADERS  += \
 	ui/teksettings.h \
 	visa/visa.h \
 	visa/visatype.h \
-    ui/types.hpp
+	ui/types.hpp
 
-LIBS        +=	-L$$PWD/lib/ -lvisa
-INCLUDEPATH +=	  $$PWD/lib/
+LIBS += -lvisa
 
 release {
 	QMAKE_CXXFLAGS_RELEASE	-= -O1

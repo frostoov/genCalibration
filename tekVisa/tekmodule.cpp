@@ -6,7 +6,7 @@ namespace tekVisa {
 genModule::genModule()
 {
 	active = false;
-	_channel = 0;
+	_channel = 1;
 	setDefaultSettings(0);
 	setDefaultSettings(1);
 	loadSettigs();
@@ -41,17 +41,17 @@ void genModule::loadSettigs()
 
 bool genModule::openSession()
 {
-	ViStatus status;
-	ViUInt32 numInit;
-	const ViString resName = (const ViString)"USB?*INSTR{VI_ATTR_MANF_ID==0x0699}";
-	ViChar desc[VI_FIND_BUFLEN+1];
-	status = viOpenDefaultRM(&_resMN);
+	ViUInt32 numInit = 0;
+	auto resName = (const ViString)"USB?*INSTR{VI_ATTR_MANF_ID==0x0699}";
+	ViChar desc[VI_FIND_BUFLEN + 1];
+	auto status = viOpenDefaultRM(&_resMN);
 	if (status != VI_SUCCESS)
 	{
 		pushAction(genActions::init,status);
 		return false;
 	}
 	status = viFindRsrc(_resMN, resName , &_mainFList, &numInit, desc);
+//	status = viFindNext( _mainFList,desc);
 	cout << "viFindRsrc errCode = " << status <<endl;
 	if (status != VI_SUCCESS)
 	{
@@ -71,8 +71,7 @@ bool genModule::openSession()
 
 bool genModule::closeSession()
 {
-	ViStatus status;
-	status = viClose(_session);
+	auto status = viClose(_session);
 	pushAction(genActions::close,status);
 	if (status != VI_SUCCESS)
 		return false;
