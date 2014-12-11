@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+//The fetred
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLineEdit>
@@ -49,9 +49,10 @@ private:
 	QTableWidget*homingTable;
 	QHBoxLayout	*tableHLayout;
 	array< array<QTableWidgetItem, 4>, 4>	homingItems;
+//	vector< vector<QTableWidgetItem> >	homingItems;
 
-	void		initializeElements();
-	void		initializeLayouts();
+	void		initializeElements	();
+	void		initializeLayouts	();
 	inline void	addToList			(const string& addStr);
 	void		readFromMemory		(const int& numberChannel);
 	void		writeToMemory		(const int& numberChannel);

@@ -16,23 +16,19 @@ MainWindow::MainWindow(QWidget *parent)
 	initializeElements();
 	initializeLayouts();
 	centralWidget->setLayout(addPlotsVLayout);
-//	mainHLayout->setSizeConstraint(QLayout::SetFixedSize);
-	rightVLayout->setSizeConstraint(QLayout::SetFixedSize);
-	saveVLayout->setSizeConstraint(QLayout::SetFixedSize);
-	output->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	output->resize(output->size().width(), output->size().height() - 100);
-	plots->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-//	addPlotsVLayout->setSizeConstraint(QLayout::SetFixedSize);
-//	centralWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	centralWidget->setFixedSize(1024, 768);
 	settings->hide();
-	dataTable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	tablesWidget->setWindowTitle("Tables Window");
+	dataTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	dataTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	homingTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	homingTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
+		{
+			homingItems[i][j].setText("111");
 			homingTable->setItem(i, j, &homingItems[i][j]);
-
+		}
 
 	connect(exitButton,		&QPushButton::clicked,
 			this,			&MainWindow::close);
@@ -126,8 +122,8 @@ void MainWindow::initializeLayouts()
 	rightVLayout->		addWidget(settings);
 	mainHLayout->		addWidget(output);
 	mainHLayout->		addLayout(rightVLayout);
-	addPlotsVLayout->	addLayout(mainHLayout);
-	addPlotsVLayout->	addWidget(plots);
+	addPlotsVLayout->	addLayout(mainHLayout, 1);
+	addPlotsVLayout->	addWidget(plots, 4);
 
 	tableHLayout->		addWidget(dataTable);
 	tableHLayout->		addWidget(homingTable);
@@ -181,7 +177,8 @@ void MainWindow::showSettingsClick()
 
 void MainWindow::goButtonClick()
 {
-
+	calculation->setPathToFile("/home/main/data/");
+//	calculation->writeHomingToFiles();
 }
 
 void MainWindow::stopButtonClick()
@@ -203,11 +200,14 @@ void MainWindow::showTablesClick()
 
 void MainWindow::writeToHomingTable()
 {
-	static array< array<QTableWidgetItem, 4>, 4>	homingItems;
+//	static array< array<QTableWidgetItem, 4>, 4>	homingItems;
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
 			homingItems[i][j].setText(
 						QString::number(calculation->returnHoming()[i][j]));
+//	for (int i = 0; i < 4; i++)
+//		for (int j = 0; j < 4; j++)
+//			homingTable
 }
 
 void MainWindow::writeToDataTable()

@@ -136,10 +136,6 @@ void SetBeginTime (byte CreiteNum, word hour, word min, word sec,
 								   word mlsec, word mksec, word dnsec);
 void GetTimer (byte CreiteNum);
 void GetTimeEvent (byte CreiteNum, byte Bank);
-//===========================================================================
-//===========================================================================
-//===========================================================================
-//===========================================================================
 longw GetBaseAddrCenter(byte CreiteNum);
 void StartTimer (byte CreiteNum);
 void StartApparatSynchro (byte CreiteNum);
@@ -151,7 +147,7 @@ void Timer_Init ( byte Nclast, byte *ClastReady );
 int  ReadConfiguration(byte Claster, int *TH, int *HV, int flag);
 void ReadConfigFile(int *Thres, int *HV);
 void SaveConfigFile(int *Thres, int *HV);
-int OpenNewFile(unsigned long nnn, int por, int flag );
+int OpenNewFile(unsigned long nnn, int por);
 void SaveData ( byte Claster, byte Bank, int event, int por );
 void SaveData (unsigned char Claster, unsigned char Bank, int event, int por);
 int ReadAmplAnalizator ( byte Claster );
@@ -160,7 +156,7 @@ class sock;
 void ReadStopTime (void);
 int GetStopRun  ( void );
 void GetBaseLine (byte Claster, byte PlataNum, int *BaseLine, int flag );
-void SetThresholdWithBaseLine (byte Claster, int *Threshold, int flag );
+void SetThresholdWithBaseLine (byte Claster, int *Threshold);
 void UnConnect( void);
 void Connect(char* host,int size);
 int ReadWordExt12(ULONG adr,UWORD AModifier);     /* get word from arbitrary address */

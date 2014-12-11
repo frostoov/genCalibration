@@ -44,8 +44,8 @@ void processing::setPathToFile(const string& pathToSaveInput)
 {
 	pathToSave = pathToSaveInput;
 
-	data = {0};
-	homing = {0};
+	data = {};
+	homing = {};
 }
 
 void processing::writeDataToFiles()

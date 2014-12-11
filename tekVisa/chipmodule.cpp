@@ -38,7 +38,7 @@ void chipModule::mountThresh()
 	{
 		Claster = ClasterReady[ii];
 		printf("Claster=%i\n",Claster+1);
-		SetThresholdWithBaseLine ( Claster, _thresh, 0 );
+		SetThresholdWithBaseLine ( Claster, _thresh);
 	}
 	printf("\n");
 }
@@ -48,7 +48,7 @@ int chipModule::sendOneSignal(int amp)
 	_module->setLowLevel(0);
 	_module->setHighLevel(amp);
 	_module->activateChannel(true);
-	vector<int> max = sniffMainBlockSignals(nnn, _thresh, 1, 1);
+	vector<int> max = sniffMainBlockThree(nnn, 1);
 	_module->activateChannel(false);
 	int howChipChannel = returnChipChannel();
 	return max[howChipChannel];
@@ -58,6 +58,8 @@ void chipModule::sendLongSignal(int ampStart, int ampEnd, int ampStep)
 {
 	_calibr.clear();
 	int howChipChannel = returnChipChannel();
+	//TODO
+	howChipChannel = 0;
 	_module->setLowLevel(0);
 	_module->setHighLevel(ampStart);
 	_module->activateChannel(true);
@@ -66,9 +68,9 @@ void chipModule::sendLongSignal(int ampStart, int ampEnd, int ampStep)
 		if (stopFlag == true)
 			break;
 		_module->setHighLevel(ampGo);
-		vector<int> max = sniffMainBlockThree(nnn, 1, 1);
+		vector<int> max = sniffMainBlockThree(nnn, 1);
 		cout << max[0] << "  " << max[1] << "  " << max[2] << "  " << max[3] << endl;
-		_calibr.push_back(pair<int, int>(ampGo, max[0]));
+		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
 		cout << "ampGo: " << ampGo << endl;
 	}
 	_module->activateChannel(false);
@@ -79,6 +81,8 @@ void chipModule::sendLongSignalNotify(int ampStart, int ampEnd, int ampStep)
 	ampCalibrMutex.lock();
 	_calibr.clear();
 	int howChipChannel = returnChipChannel();
+	//TODO
+	howChipChannel = 0;
 	_module->setLowLevel(0);
 	_module->setHighLevel(ampStart);
 	_module->activateChannel(true);
@@ -89,9 +93,9 @@ void chipModule::sendLongSignalNotify(int ampStart, int ampEnd, int ampStep)
 		_module->setHighLevel(ampGo);
 		vector<int> max;
 		for (int i = 0; i < 2; i++)
-			max = sniffMainBlockThree(nnn, 1, 1);
+			max = sniffMainBlockThree(nnn, 1);
 		cout << max[0] << "  " << max[1] << "  " << max[2] << "  " << max[3] << endl;
-		_calibr.push_back(pair<int, int>(ampGo, max[0]));
+		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
 		this->notify(chipModule::statusUpdate);
 		cout << "ampGo: " << ampGo << endl;
 	}
@@ -160,6 +164,8 @@ int chipModule::searchThresh()
 {
 	_calibr.clear();
 	int howChipChannel = returnChipChannel();
+	//TODO
+	howChipChannel = 0;
 	_module->setLowLevel(0);
 	_module->setHighLevel(100);
 	_module->activateChannel(true);
@@ -172,9 +178,9 @@ int chipModule::searchThresh()
 			if (_calibr[sizeCalibr].second > 0 && _calibr[sizeCalibr - 1].second > 0 && _calibr[sizeCalibr - 2].second > 0)
 				return _calibr[sizeCalibr - 2].first;
 		_module->setHighLevel(ampGo);
-		vector<int> max = sniffMainBlockThree(nnn, 1, 1);
+		vector<int> max = sniffMainBlockThree(nnn, 1);
 		cout << max[0] << "  " << max[1] << "  " << max[2] << "  " << max[3] << endl;
-		_calibr.push_back(pair<int, int>(ampGo, max[0]));
+		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
 		sizeCalibr++;
 		cout << "ampGo: " << ampGo << endl;
 	}
@@ -251,7 +257,7 @@ vector<int> chipModule::searchAiming(int amp)
 	vector<int> deviation;
 	for (int i = 0; i < 100; i++)
 	{
-		vector<int> max = sniffMainBlockThree(nnn, 1, 1);
+		vector<int> max = sniffMainBlockThree(nnn, 1);
 		for (int j = 0; j < 4; j++)
 			if (deviation[j] < max[j])
 				deviation[j] = max[j];

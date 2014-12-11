@@ -31,7 +31,7 @@ public:
 	VME(){
 		connected = false;
 		SyncFlag = 0;
-		host = "192.168.1.89";
+		host = (char*)"192.168.1.89";
 		Socket_Port = 5858;
 		val = 1;
 		mess_len = 0;
@@ -40,11 +40,11 @@ public:
 //		SetHost(host,sizeof(host));
 	};
 
-	~VME(){ free(host); UnConnectVME();};
+	~VME(){ free(host); UnConnectVME();}
 
 	int ErrCode(bool PrErr); //return error code and print error if PrErr = true
-	byte GetStat(){return Stat;};//return status from read Packet
-	bool GetConnected(){ return connected;};//return connected flag
+	byte GetStat(){return Stat;}//return status from read Packet
+	bool GetConnected(){ return connected;}//return connected flag
 	
 	void SetHost(const char *Host, byte SizeByte)
 	{ 
@@ -53,14 +53,14 @@ public:
 	host = (char*)malloc(SizeByte);
 	strcpy(host,Host);
 	printf("!!!!!!!!!!!!!host=%s\n",host);	
-	};
+	}
 	void SetSocketPort(int Sock_Port) {
 //	printf("qqqqqqqqq\n");
 	Socket_Port = Sock_Port;
-	};
+	}
 
-	int SockID(){ return nsid;};//return socket's nsid
-	void SockSHDN(){sc->shutdown();};//shutdown socket
+	int SockID(){ return nsid;}//return socket's nsid
+	void SockSHDN(){sc->shutdown();}//shutdown socket
 
 	int ConnectVME();
 
@@ -71,19 +71,19 @@ public:
 	    close(nsid);
 	    delete sc;
 	    return 0;
-	};
+	}
 
 	int GetSync(void) {
 	    return SyncFlag;
-	};
+	}
 	void ClearSync() {
 	    SyncFlag=0;
 	
-	};
+	}
 	void SetSyncErr() {
 	    SyncFlag=1;
 	
-	};
+	}
 
 	int ConnectClient();
 	
