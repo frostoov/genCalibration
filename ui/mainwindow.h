@@ -49,7 +49,7 @@ private:
 	QTableWidget*homingTable;
 	QHBoxLayout	*tableHLayout;
 	array< array<QTableWidgetItem, 4>, 4>	homingItems;
-//	vector< vector<QTableWidgetItem> >	homingItems;
+	array< array<QTableWidgetItem, 4>, 4>	dataItems;
 
 	void		initializeElements	();
 	void		initializeLayouts	();

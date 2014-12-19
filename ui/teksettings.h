@@ -43,7 +43,6 @@ protected:
 	void	setInterval();
 	void	setWidth();
 	void	setChannel();
-	void	setChipChannel();
 	void	updateSettings();
 private:
 	tekModule				*_module;

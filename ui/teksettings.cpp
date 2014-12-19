@@ -178,17 +178,6 @@ void tekSettings::setLowLevel()
 	_module->notify(tekModule::statusUpdate);
 }
 
-void tekSettings::setChipChannel()
-{
-	vector<char> forModule;
-	for (int i = 0; i < (signed)chipChannel.size(); i++)
-		if (chipChannel[i]->isChecked() == true)
-			forModule.push_back('1');
-		else
-			forModule.push_back('0');
-	_chip->setChipChannel(forModule);
-}
-
 void tekSettings::setSettings()
 {
 	_module->setRightFront	( rightFrontL->text().toInt() );

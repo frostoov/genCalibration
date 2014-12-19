@@ -37,19 +37,24 @@ void plotsOutput::obsUpdate(const Subject *subject)
 {
 	if (subject == _chip)
 	{
-		if (_chip->returnMode() == chipModule::mode::ampFirst)
+		if (_chip->returnMode() == chipModule::mode::amp)
 		{
-			ampFirstData.first.push_back(_chip->returnLastAmp().first);
-			ampFirstData.second.push_back(_chip->returnLastAmp().second);
-			cout << _chip->returnLastAmp().first << "   " << _chip->returnLastAmp().second << endl;
+//			ampFirstData.first.push_back(_chip->returnLastAmp().first);
+//			ampFirstData.second.push_back(_chip->returnLastAmp().second);
+//			cout << _chip->returnLastAmp().first << "   " << _chip->returnLastAmp().second << endl;
+			ampFirstData.first.push_back(_chip->returnLastAmp()->first);
+			ampFirstData.second.push_back(_chip->returnLastAmp()->second[0]);
+			ampSecondData.first.push_back(_chip->returnLastAmp()->first);
+			ampSecondData.second.push_back(_chip->returnLastAmp()->second[1]);
 			renderFirst();
-		}
-		if (_chip->returnMode() == chipModule::mode::ampSecond)
-		{
-			ampSecondData.first.push_back(_chip->returnLastAmp().first);
-			ampSecondData.second.push_back(_chip->returnLastAmp().second);
 			renderSecond();
 		}
+//		if (_chip->returnMode() == chipModule::mode::ampSecond)
+//		{
+//			ampSecondData.first.push_back(_chip->returnLastAmp().first);
+//			ampSecondData.second.push_back(_chip->returnLastAmp().second);
+//			renderSecond();
+//		}
 		if (_chip->returnMode() == chipModule::mode::form)
 		{
 			formData.first.push_back(_chip->returnLastThresh().first);

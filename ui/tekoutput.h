@@ -6,6 +6,7 @@
 #include <QString>
 #include <fstream>
 #include "mutex"
+#include <thread>
 
 #include "observer/observer.h"
 #include "tekVisa/tekmodule.h"
@@ -36,6 +37,7 @@ private:
 	tekModule	*_module;
 	chipModule	*_chip;
 	ofstream	logStream;
+	thread::id	homeID;
 };
 
 #endif // TEKOUTPUT_H

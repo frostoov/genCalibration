@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <thread>
 
 using namespace std;
 
@@ -9,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 	module	= new tekModule;
 	chip	= new chipModule	(module);
 	output	= new tekOutput		(module, chip, this);
-	settings= new tekSettings	(module,tr("Settings"),this);
+	settings= new tekSettings	(module,tr("Settings"));
 	plots	= new plotsOutput	(chip, this);
 	calculation	= new processing;
 
@@ -25,10 +24,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
-		{
-			homingItems[i][j].setText("111");
 			homingTable->setItem(i, j, &homingItems[i][j]);
-		}
+
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			dataTable->setItem(i, j, &dataItems[i][j]);
 
 	connect(exitButton,		&QPushButton::clicked,
 			this,			&MainWindow::close);
@@ -119,7 +119,7 @@ void MainWindow::initializeLayouts()
 	saveVLayout->		addRow("Name chip", numberChipL);
 	rightVLayout->		addLayout(controlHLayout);
 	rightVLayout->		addLayout(saveVLayout);
-	rightVLayout->		addWidget(settings);
+//	rightVLayout->		addWidget(settings);
 	mainHLayout->		addWidget(output);
 	mainHLayout->		addLayout(rightVLayout);
 	addPlotsVLayout->	addLayout(mainHLayout, 1);
@@ -139,10 +139,10 @@ void MainWindow::initializeElements()
 	showSettings =	new QPushButton("Show Settings", this);
 	showTables =	new QPushButton("Show Tables", this);
 	stopButton =	new QPushButton("Stop Calibration", this);
-	numberChipL =	new QLineEdit("0", this);
 	pathToSaveL =	new QLineEdit("/home/main/log/", this);
+	numberChipL =	new QLineEdit("0", this);
 
-	dataTable =		new QTableWidget(4, 3, this);
+	dataTable =		new QTableWidget(4, 4, this);
 	homingTable =	new QTableWidget(4, 4, this);
 }
 
@@ -177,8 +177,26 @@ void MainWindow::showSettingsClick()
 
 void MainWindow::goButtonClick()
 {
-	calculation->setPathToFile("/home/main/data/");
-//	calculation->writeHomingToFiles();
+//	int howChipChannel = chip->searchAndSetChipChannel();
+//	chip->calibration(100, 10);
+//	chip->saveToFileAmp("/home/main/data/", howChipChannel);
+//	chip->saveToFileThresh("/home/main/data/", howChipChannel);
+//	calculation->setPathToFile("/home/main/data/");
+//	calculation->setChipChannel(howChipChannel);
+//	auto	aimingLowAmp	= chip->searchAiming(howChipChannel, 100);
+//	auto	aimingHighAmp	= chip->searchAiming(howChipChannel, 10000);
+//	if (howChipChannel == 0)
+//	{
+//		calculation->computeHomingValues(0, aimingLowAmp.first, aimingHighAmp.first);
+//		calculation->computeHomingValues(1, aimingLowAmp.second, aimingHighAmp.second);
+//	}
+//	if (howChipChannel == 1)
+//	{
+//		calculation->computeHomingValues(2, aimingLowAmp.first, aimingHighAmp.first);
+//		calculation->computeHomingValues(3, aimingLowAmp.second, aimingHighAmp.second);
+//	}
+//	calculation->computeForOneRecordAmp();
+//	calculation->computeForOneRecordForm();
 }
 
 void MainWindow::stopButtonClick()
@@ -190,8 +208,11 @@ void MainWindow::showTablesClick()
 {
 	if (tablesWidget->isHidden() == true)
 	{
+		calculation->setPathToFile("/home/main/data/");
 		calculation->readHomingFromFiles();
+		calculation->readDataFromFiles();
 		writeToHomingTable();
+		writeToDataTable();
 		tablesWidget->show();
 	}
 	else
@@ -200,33 +221,25 @@ void MainWindow::showTablesClick()
 
 void MainWindow::writeToHomingTable()
 {
-//	static array< array<QTableWidgetItem, 4>, 4>	homingItems;
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
+		{
 			homingItems[i][j].setText(
 						QString::number(calculation->returnHoming()[i][j]));
-//	for (int i = 0; i < 4; i++)
-//		for (int j = 0; j < 4; j++)
-//			homingTable
+		}
 }
 
 void MainWindow::writeToDataTable()
 {
-	for (int i = 0; i < 4; i++)
-		dataTable->setItem(i, 0, new QTableWidgetItem(
-								QString::number(calculation->returnData().transformationADC[i])));
-	for (int i = 0; i < 4; i++)
-		dataTable->setItem(i, 1, new QTableWidgetItem(
-							   QString::number(calculation->returnData().errorADC[i])));
-	for (int i = 0; i < 4; i++)
-		dataTable->setItem(i, 2, new QTableWidgetItem(
-							   QString::number(calculation->returnData().nonlinearity[i])));
-	for (int i = 0; i < 2; i++)
-		dataTable->setItem(i, 3, new QTableWidgetItem(
-							   QString::number(calculation->returnData().transformationDAC[i])));
-	for (int i = 0; i < 2; i++)
-		dataTable->setItem(i, 4, new QTableWidgetItem(
-							   QString::number(calculation->returnData().errorDAC[i])));
+	for (int j = 0; j < 4; j++)
+	{
+		dataItems[j][0].setText(
+					QString::number(calculation->returnData().transformationADC[j]));
+		dataItems[j][1].setText(
+					QString::number(calculation->returnData().errorADC[j]));
+		dataItems[j][2].setText(
+					QString::number(calculation->returnData().nonlinearity[j]));
+	}
 }
 
 

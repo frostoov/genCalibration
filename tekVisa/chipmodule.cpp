@@ -4,7 +4,6 @@
 chipModule::chipModule(genModule *tekMod)
 {
 	_module = tekMod;
-	_chipChannel.resize(4);
 }
 
 bool chipModule::openSession()
@@ -26,6 +25,18 @@ void chipModule::closeSession()
 	UnConnect();
 }
 
+void chipModule::tekModuleActivateChannel(int channel, bool status)
+{
+	_module->setChannel(channel);
+	_module->activateChannel(status);
+}
+
+void chipModule::tekModuleSetHighLevel(int channel, int level)
+{
+	_module->setChannel(channel);
+	_module->setHighLevel(level);
+}
+
 void chipModule::setThresh(int numberChipChannel, int codeThresh)
 {
 	_thresh[numberChipChannel + 12] = codeThresh;
@@ -43,49 +54,57 @@ void chipModule::mountThresh()
 	printf("\n");
 }
 
-int chipModule::sendOneSignal(int amp)
+vector<int> chipModule::sendOneSignal(int amp)
 {
+	tekModuleActivateChannel(0, true);
 	_module->setLowLevel(0);
-	_module->setHighLevel(amp);
-	_module->activateChannel(true);
+	tekModuleSetHighLevel(0, amp);
+	tekModuleActivateChannel(1, true);
+	_module->setLowLevel(0);
+	tekModuleSetHighLevel(1, amp);
 	vector<int> max = sniffMainBlockThree(nnn, 1);
-	_module->activateChannel(false);
-	int howChipChannel = returnChipChannel();
-	return max[howChipChannel];
+	tekModuleActivateChannel(0, false);
+	tekModuleActivateChannel(1, false);
+	return max;
 }
 
 void chipModule::sendLongSignal(int ampStart, int ampEnd, int ampStep)
 {
 	_calibr.clear();
-	int howChipChannel = returnChipChannel();
-	//TODO
-	howChipChannel = 0;
+	tekModuleActivateChannel(0, true);
 	_module->setLowLevel(0);
-	_module->setHighLevel(ampStart);
-	_module->activateChannel(true);
+	tekModuleSetHighLevel(0, ampStart);
+	tekModuleActivateChannel(1, true);
+	_module->setLowLevel(0);
+	tekModuleSetHighLevel(1, ampStart);
 	for (int ampGo = ampStart + ampStep; ampGo <= ampEnd; ampGo += ampStep)
 	{
 		if (stopFlag == true)
 			break;
-		_module->setHighLevel(ampGo);
+		tekModuleSetHighLevel(0, ampGo);
+		tekModuleSetHighLevel(1, ampGo);
 		vector<int> max = sniffMainBlockThree(nnn, 1);
 		cout << max[0] << "  " << max[1] << "  " << max[2] << "  " << max[3] << endl;
-		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
+		if (howChipChannel == 0)
+			_calibr[ampGo] = array<int, 2>({max[0], max[1]});
+		else
+			_calibr[ampGo] = array<int, 2>({max[2], max[3]});
 		cout << "ampGo: " << ampGo << endl;
 	}
-	_module->activateChannel(false);
+	tekModuleActivateChannel(0, false);
+	tekModuleActivateChannel(1, false);
 }
 
 void chipModule::sendLongSignalNotify(int ampStart, int ampEnd, int ampStep)
 {
 	ampCalibrMutex.lock();
 	_calibr.clear();
-	int howChipChannel = returnChipChannel();
-	//TODO
-	howChipChannel = 0;
+	tekModuleActivateChannel(0, true);
 	_module->setLowLevel(0);
-	_module->setHighLevel(ampStart);
-	_module->activateChannel(true);
+	tekModuleSetHighLevel(0, ampStart);
+	tekModuleActivateChannel(1, true);
+	_module->setLowLevel(0);
+	tekModuleSetHighLevel(1, ampStart);
 	for (int ampGo = ampStart + ampStep; ampGo <= ampEnd; ampGo += ampStep)
 	{
 		if (stopFlag == true)
@@ -95,45 +114,39 @@ void chipModule::sendLongSignalNotify(int ampStart, int ampEnd, int ampStep)
 		for (int i = 0; i < 2; i++)
 			max = sniffMainBlockThree(nnn, 1);
 		cout << max[0] << "  " << max[1] << "  " << max[2] << "  " << max[3] << endl;
-		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
+		if (howChipChannel == 0)
+			_calibr[ampGo] = array<int, 2>({max[0], max[1]});
+		else
+			_calibr[ampGo] = array<int, 2>({max[2], max[3]});
 		this->notify(chipModule::statusUpdate);
 		cout << "ampGo: " << ampGo << endl;
 	}
-	_module->activateChannel(false);
+	tekModuleActivateChannel(0, false);
+	tekModuleActivateChannel(1, false);
 	ampCalibrMutex.unlock();
 }
 
-void chipModule::setChipChannel(const vector<char> &chipChoose)
+int chipModule::searchAndSetChipChannel()
 {
-	for (int i = 0; i < (signed)_chipChannel.size(); i++)
-		_chipChannel[i] = chipChoose[i];
+	vector<int>	response = sendOneSignal(5000);
+	if (response[0] > 50 && response[1] > 50)
+	{
+		howChipChannel = 0;
+		return 0;
+	}
+	if (response[2] > 50 && response[3] > 50)
+	{
+		howChipChannel = 0;
+		return 1;
+	}
+	return -1;
 }
 
-int chipModule::returnChipChannel()	const
+void chipModule::saveToFileAmp(const string& pathToFile, int chipChannel)
 {
-	int howChipChannelChoose = -1;
-	if (_module->getChannelActive() == 1)
-		for (int i = 0; i < 4; i++)
-			if (_chipChannel[i] == '1')
-			{
-				howChipChannelChoose = i;
-				break;
-			}
-	if (_module->getChannelActive() == 2)
-		for (int i = 3; i >= 0; i--)
-			if (_chipChannel[i] == '1')
-			{
-				howChipChannelChoose = i;
-				break;
-			}
-	return howChipChannelChoose;
-}
-
-void chipModule::saveToFileAmp(const string& pathToFile)
-{
-	ofstream saveFile(pathToFile);
-	for (int i = 0; i < (signed)_calibr.size(); i++)
-		saveFile << _calibr[i].first << "\t" << _calibr[i].second << endl;
+	ofstream saveFile(string(pathToFile) += string("amp") += to_string(chipChannel));
+	for (auto it : _calibr)
+		saveFile << it.first << "\t" << it.second[0] << "\t" << it.second[1] << endl;
 	saveFile.close();
 }
 
@@ -147,7 +160,7 @@ void chipModule::setSettings(int channel, int ampStart, int ampEnd, int ampStep)
 void chipModule::ampCalibration(int stepAmp, int stepThresh)
 {
 	stopFlag = false;
-	activeMode = chipModule::mode::ampFirst;
+	activeMode = chipModule::mode::amp;
 	setThresh(0, 10);
 	setThresh(1, 10);
 	setThresh(2, 10);
@@ -163,28 +176,34 @@ void chipModule::ampCalibration(int stepAmp, int stepThresh)
 int chipModule::searchThresh()
 {
 	_calibr.clear();
-	int howChipChannel = returnChipChannel();
-	//TODO
-	howChipChannel = 0;
+	tekModuleActivateChannel(0, true);
 	_module->setLowLevel(0);
-	_module->setHighLevel(100);
-	_module->activateChannel(true);
+	tekModuleSetHighLevel(0, 100);
+	tekModuleActivateChannel(1, true);
+	_module->setLowLevel(0);
+	tekModuleSetHighLevel(1, 100);
 	int sizeCalibr = 0;
 	for (int ampGo = 100; ampGo <= 10000; ampGo += 100)
 	{
 		if (stopFlag == true)
 			break;
-		if (sizeCalibr > 3)
-			if (_calibr[sizeCalibr].second > 0 && _calibr[sizeCalibr - 1].second > 0 && _calibr[sizeCalibr - 2].second > 0)
-				return _calibr[sizeCalibr - 2].first;
-		_module->setHighLevel(ampGo);
+//		if (sizeCalibr > 3)
+//			if (_calibr[sizeCalibr][0] > 0 && _calibr[sizeCalibr - 1][0] > 0 && _calibr[sizeCalibr - 2][0] > 0)
+//				return _calibr[sizeCalibr - 2];
+		//TODO
+		tekModuleSetHighLevel(0, ampGo);
+		tekModuleSetHighLevel(1, ampGo);
 		vector<int> max = sniffMainBlockThree(nnn, 1);
 		cout << max[0] << "  " << max[1] << "  " << max[2] << "  " << max[3] << endl;
-		_calibr.push_back(pair<int, int>(ampGo, max[howChipChannel]));
+		if (howChipChannel == 0)
+			_calibr[ampGo] = array<int, 2>({max[0], max[1]});
+		else
+			_calibr[ampGo] = array<int, 2>({max[2], max[3]});
 		sizeCalibr++;
 		cout << "ampGo: " << ampGo << endl;
 	}
-	_module->activateChannel(false);
+	tekModuleActivateChannel(0, false);
+	tekModuleActivateChannel(1, false);
 	return -1;
 }
 
@@ -213,11 +232,13 @@ void chipModule::threshCalibration(int step)
 //	calibr.detach();
 }
 
-void chipModule::saveToFileThresh(const string& pathToFile)
+void chipModule::saveToFileThresh(const string& pathToFile, int chipChannel)
 {
-	ofstream saveFile(pathToFile);
-	for (int i = 0; i < (signed)_threshList.size(); i++)
-		saveFile << _threshList[i].first << "\t" << _threshList[i].second << endl;
+	ofstream saveFile(string(pathToFile) += string("thresh") += to_string(chipChannel));
+	for (auto it : _threshList)
+		saveFile << it.first << "\t" << it.second << endl;
+//	for (int i = 0; i < (signed)_threshList.size(); i++)
+//		saveFile << _threshList[i].first << "\t" << _threshList[i].second << endl;
 	saveFile.close();
 }
 
@@ -226,9 +247,9 @@ chipModule::mode chipModule::returnMode()	const
 	return activeMode;
 }
 
-pair<int, int>	chipModule::returnLastAmp()	const
+const map<int, array<int, 2>>::const_reverse_iterator& chipModule::returnLastAmp()	const
 {
-	return _calibr.back();
+	return _calibr.rbegin();
 }
 
 pair<int, int>	chipModule::returnLastThresh()	const
@@ -247,25 +268,45 @@ void chipModule::calibration(int stepAmp, int stepThresh)
 	calibrAmp.detach();
 }
 
-vector<int> chipModule::searchAiming(int amp)
+pair<vector<int>, vector<int>> chipModule::searchAiming(int chipChannel, int amp)
 {
 	_calibr.clear();
-	int howChipChannel = returnChipChannel();
+	int chipV4channel;
+	pair<vector<int>, vector<int>>	deviation;
+	if (chipChannel == 0)
+		chipV4channel = 0;
+	if (chipChannel == 1)
+		chipV4channel = 2;
+	tekModuleActivateChannel(0, true);
 	_module->setLowLevel(0);
-	_module->setHighLevel(amp);
-	_module->activateChannel(true);
-	vector<int> deviation;
+	tekModuleSetHighLevel(0, amp);
 	for (int i = 0; i < 100; i++)
 	{
 		vector<int> max = sniffMainBlockThree(nnn, 1);
 		for (int j = 0; j < 4; j++)
-			if (deviation[j] < max[j])
-				deviation[j] = max[j];
+			if (deviation.first[j] < max[j])
+				deviation.first[j] = max[j];
 	}
-	_module->activateChannel(false);
-	//TODO
-	howChipChannel = 0;
-	deviation[howChipChannel] = -1000;
+	tekModuleActivateChannel(0, false);
+	deviation.first[chipV4channel] = -1000;
+
+
+	if (chipChannel == 0)
+		chipV4channel = 1;
+	if (chipChannel == 1)
+		chipV4channel = 3;
+	tekModuleActivateChannel(1, true);
+	_module->setLowLevel(0);
+	tekModuleSetHighLevel(1, amp);
+	for (int i = 0; i < 100; i++)
+	{
+		vector<int> max = sniffMainBlockThree(nnn, 1);
+		for (int j = 0; j < 4; j++)
+			if (deviation.second[j] < max[j])
+				deviation.second[j] = max[j];
+	}
+	tekModuleActivateChannel(1, false);
+	deviation.second[chipV4channel] = -1000;
 	return deviation;
 }
 

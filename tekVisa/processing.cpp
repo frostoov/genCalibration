@@ -4,7 +4,16 @@ using namespace std;
 
 processing::processing()
 {
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			homing[i][j] = 0;
 
+	for (int i = 0; i < 4; i++)
+	{
+		data.transformationADC[i] = 0;
+		data.errorADC[i] = 0;
+		data.nonlinearity[i] = 0;
+	}
 }
 
 processing::~processing()
@@ -12,10 +21,15 @@ processing::~processing()
 
 }
 
-pair<double, double>	processing::getFactorTransformation(const vector<int> &ampX, const vector<int> &codeY)
+void processing::setChipChannel(int chipGroupChannel)
+{
+	howChipChannel = chipGroupChannel;
+}
+
+processing::factorTransformation	processing::getFactorTransformation(const vector<int> &ampX, const vector<int> &codeY)
 {
 	if (ampX.size() != codeY.size())
-		return pair<double, double>(-1, -1);
+		return factorTransformation({-1, -1, -1});
 
 	int sizeInput	= ampX.size();
 
@@ -37,15 +51,23 @@ pair<double, double>	processing::getFactorTransformation(const vector<int> &ampX
 	double	midX2	= x2Go / (double) sizeInput;
 	double	factor	= (midXY - midX * midY)	/ (midX2 - midX * midX);
 	double	free	= midY - factor * midX;
-	return pair<double, double>(factor, free);
+	double	maxDeviation = 10.0;
+	return factorTransformation({factor, free, maxDeviation});
+//	return pair<double, double>(factor, free);
+}
+
+double	processing::getFactorIntegral(double maxDeviation)
+{
+	const double ampMax = 255.0;
+	return maxDeviation / ampMax * 100.0;
 }
 
 void processing::setPathToFile(const string& pathToSaveInput)
 {
 	pathToSave = pathToSaveInput;
 
-	data = {};
-	homing = {};
+//	data = {};
+//	homing = {};
 }
 
 void processing::writeDataToFiles()
@@ -89,7 +111,11 @@ void processing::readHomingFromFiles()
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
+		{
 			mainFile >> homing[i][j];
+			cout << homing[i][j] << "  ";
+		}
+		cout << endl;
 	}
 	mainFile.close();
 }
@@ -108,17 +134,98 @@ void processing::helpVision()
 	}
 }
 
-void processing::setHomingValues(int chipChannel, const vector<int> &minDeviation, const vector<int> &maxDeviation)
+void processing::computeHomingValues(int chipChannelV4, const vector<int> &minDeviation, const vector<int> &maxDeviation)
 {
 	readHomingFromFiles();
 	vector<double> influenceChannel(4);
 	for (int i = 0; i < 4; i++)
-		if (i != chipChannel)
+		if (i != chipChannelV4)
 			influenceChannel[i] = 20.0 * log10(maxDeviation[i] / minDeviation[i]);
-	influenceChannel[chipChannel] = -1000;
+	influenceChannel[chipChannelV4] = -1000;
 	for (int i = 0; i < 4; i++)
-			homing[chipChannel][i] = influenceChannel[i];
+			homing[chipChannelV4][i] = influenceChannel[i];
 	writeHomingToFiles();
+}
+
+void processing::readOneRecordAmp(const string &pathToFile)
+{
+	vecX.clear();
+	vecFirst.clear();
+	vecSecond.clear();
+	ifstream	mainFile(pathToFile);
+	while (!mainFile.eof())
+	{
+		int readX, readFirst, readSecond;
+		mainFile >> readX >> readFirst >> readSecond;
+		vecX.push_back(readX);
+		vecFirst.push_back(readFirst);
+		vecSecond.push_back(readSecond);
+	}
+	mainFile.close();
+}
+
+void processing::readOneRecordForm(const string &pathToFile)
+{
+	vecX.clear();
+	vecFirst.clear();
+	vecSecond.clear();
+	ifstream	mainFile(pathToFile);
+	while (!mainFile.eof())
+	{
+		int readX, readFirst;
+		mainFile >> readX >> readFirst;
+		vecX.push_back(readX);
+		vecFirst.push_back(readFirst);
+	}
+	mainFile.close();
+}
+
+void processing::computeForOneRecordAmp()
+{
+	readDataFromFiles();
+	readOneRecordAmp(string(pathToSave) += string("amp") += to_string(howChipChannel));
+	factorTransformation	exchangeFirst = getFactorTransformation(vecX, vecFirst);
+	factorTransformation	exchangeSecond = getFactorTransformation(vecX, vecSecond);
+	double factorIntegFirst		= getFactorIntegral(exchangeFirst.maxDeviation);
+	double factorIntegSecond	= getFactorIntegral(exchangeSecond.maxDeviation);
+	if (howChipChannel == 0)
+	{
+		data.transformationADC[0]	= exchangeFirst.factor;
+		data.errorADC[0]			= exchangeFirst.error;
+		data.transformationADC[1]	= exchangeSecond.factor;
+		data.errorADC[1]			= exchangeSecond.error;
+		data.nonlinearity[0]		= factorIntegFirst;
+		data.nonlinearity[1]		= factorIntegSecond;
+	}
+	else
+	{
+		data.transformationADC[2]	= exchangeFirst.factor;
+		data.errorADC[2]			= exchangeFirst.error;
+		data.transformationADC[3]	= exchangeSecond.factor;
+		data.errorADC[3]			= exchangeSecond.error;
+		data.nonlinearity[2]		= factorIntegFirst;
+		data.nonlinearity[3]		= factorIntegSecond;
+	}
+	writeDataToFiles();
+}
+
+void processing::computeForOneRecordForm()
+{
+	readDataFromFiles();
+	readOneRecordForm(string(pathToSave) += string("form") += to_string(howChipChannel));
+	factorTransformation	exchange = getFactorTransformation(vecX, vecFirst);
+//	double factorInteg	= getFactorIntegral(exchange.maxDeviation);
+	if (howChipChannel == 0)
+	{
+		data.transformationDAC[0]	= exchange.factor;
+		data.errorDAC[0]			= exchange.error;
+	}
+	else
+	{
+		data.transformationDAC[1]	= exchange.factor;
+		data.errorDAC[1]			= exchange.error;
+	}
+	writeDataToFiles();
 }
 
 const dataChip&	processing::returnData()	const

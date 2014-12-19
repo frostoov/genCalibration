@@ -1,7 +1,7 @@
 #include "tekoutput.h"
 
 tekOutput::tekOutput(tekModule *mod, chipModule *chip, QWidget *parent)
-	: QPlainTextEdit(parent) , _module(mod) , _chip(chip)
+	: QPlainTextEdit(parent) , _module(mod) , _chip(chip),homeID(this_thread::get_id())
 {
 	setReadOnly(true);
 	logStream.open("log",ofstream::binary | ofstream::app);
@@ -29,8 +29,9 @@ void tekOutput::obsUpdate(const Subject *subject)
 	}
 	if (subject == _chip)
 	{
-		if (_chip->returnMode() == chipModule::mode::ampFirst)
-			print(QString("Amplitude Go:") += QString::number(_chip->returnLastAmp().first));
+		if (_chip->returnMode() == chipModule::mode::amp)
+//			print(QString("Amplitude Go:") += QString::number(_chip->returnLastAmp().first));
+			print(QString("Amplitude Go:") += QString::number(_chip->returnLastAmp()->first));
 		if (_chip->returnMode() == chipModule::mode::form)
 			print(QString("Threshold Go:") += QString::number(_chip->returnLastThresh().first));
 	}
